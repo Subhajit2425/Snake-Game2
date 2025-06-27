@@ -250,7 +250,7 @@
         x: Math.floor(Math.random() * cols),
         y: Math.floor(Math.random() * rows)
       }));
-      obstacles = Array.from({ length: 15 }, () => ({
+      obstacles = Array.from({ length: obstacleCount || 5 }, () => ({
         x: Math.floor(Math.random() * cols),
         y: Math.floor(Math.random() * rows)
       }));
@@ -349,7 +349,7 @@
       isPaused = false;
       gameRunning = true;
 
-      document.getElementById("menu").classList.add("hidden");
+      document.getElementById("menu").style.display = "none";
       document.getElementById("gameOver").classList.add("hidden");
       gameDiv.classList.remove("hidden");
       
@@ -370,11 +370,11 @@
 
     function setDifficulty(choice) {
       if (choice === 'e') {
-        speed = 150; difficulty = "Easy"; obstacleCount = 15;
+        speed = 150; difficulty = "Easy"; obstacleCount = 20;
       } else if (choice === 'm') {
-        speed = 125; difficulty = "Medium"; obstacleCount = 20;
+        speed = 125; difficulty = "Medium"; obstacleCount = 35;
       } else if (choice === 'h') {
-        speed = 100; difficulty = "Hard"; obstacleCount = 25;
+        speed = 100; difficulty = "Hard"; obstacleCount = 50;
       }
       document.getElementById("difficultyModal").style.display = "none";
       startGame();
