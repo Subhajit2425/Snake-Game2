@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Snake Game</title>
+  <title>Snake Game 2</title>
   <style>
     body {
       background-color: black;
@@ -33,7 +33,6 @@
       background: rgba(0,0,0,0.8);
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
       color: white;
     }
@@ -141,6 +140,11 @@
 
     .hidden { display: none; }
 
+    #game, #gameOver {
+      text-align: center;
+      width: 100vh;
+    }
+
     button {
       font-size: 1rem;
       padding: 10px 25px;
@@ -159,6 +163,17 @@
       border-color: rgb(0, 240, 240);
     }
 
+    @keyframes pulseText {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
   </style>
 </head>
 <body>
@@ -166,6 +181,7 @@
 
   <!-- ✅ Main Menu -->
   <div id="menu" class="overlay">
+    <div style="height: 10vh;"></div>
     <h1 id="SnakeM">SNAKE GAME</h1>
     <div class="menuButtons">
       <button onclick="selectDifficulty()">Start Game</button>
@@ -197,9 +213,16 @@
     </div>
   </div>
 
-  <div id="gameOverScreen" class="overlay hidden">
-    <h2 id="finalScore">Game Over!</h2>
-    <button onclick="restartGame()">Restart</button>
+  <!-- ✅ Game Over Screen -->
+  <div id="gameOver" class="hidden">
+    <div style="height: 5vh;"></div>
+  <div id="OverHeader"> !! Game Over !!</div>
+    <h2 id="gameOverText"></h2>
+    <div class="overButtons">
+      <button onclick="startGame()">Restart</button>
+      <button onclick="showMenu()">Cancel</button>
+      <button class="exitBtn" onclick="showMenu()">Exit</button>
+    </div>
   </div>
 
   <script>
@@ -310,9 +333,9 @@
       clearInterval(gameInterval);
       gameRunning = false;
       
-      clearInterval(gameInterval);
-      document.getElementById("finalScore").innerText = "Game Over! Score: " + score;
-      document.getElementById("gameOverScreen").classList.remove("hidden");
+      gameDiv.classList.add("hidden");
+      document.getElementById("gameOver").classList.remove("hidden");
+      document.getElementById("gameOverText").textContent = `Score: ${score}\nHigh Score: ${highScore}`;
     }
 
     function gameLoop() {
@@ -327,7 +350,7 @@
       gameRunning = true;
 
       document.getElementById("menu").classList.add("hidden");
-      document.getElementById("gameOverScreen").classList.add("hidden");
+      document.getElementById("gameOver").classList.add("hidden");
       gameDiv.classList.remove("hidden");
       
       gameInterval = setInterval(gameLoop, speed);
@@ -347,11 +370,11 @@
 
     function setDifficulty(choice) {
       if (choice === 'e') {
-        speed = 130; difficulty = "Easy"; obstacleCount = 15;
+        speed = 150; difficulty = "Easy"; obstacleCount = 15;
       } else if (choice === 'm') {
-        speed = 105; difficulty = "Medium"; obstacleCount = 20;
+        speed = 125; difficulty = "Medium"; obstacleCount = 20;
       } else if (choice === 'h') {
-        speed = 80; difficulty = "Hard"; obstacleCount = 25;
+        speed = 100; difficulty = "Hard"; obstacleCount = 25;
       }
       document.getElementById("difficultyModal").style.display = "none";
       startGame();
