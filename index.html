@@ -379,7 +379,6 @@
       // Only allow first direction to start game
       if (!dir) {
         dir = newDir;
-        gameInterval = setInterval(gameLoop, speed);
       } else {
         // Prevent reverse movement
         if (
