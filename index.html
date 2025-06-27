@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake Game</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: monospace;
+      white-space: pre;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+    }
+
+    canvas {
+      border: 2px solid white;
+      background-color: black;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    #mobileControls {
+      margin-top: 20px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1b1b1b, #333);
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #00ffe1;
+      text-align: center;
+      color: white;
+      max-width: 600px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .modal-content a {
+      color: #00ffe1;
+      text-decoration: underline;
+    }
+
+    .modal-content button {
+      margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      #mobileControls {
+        display: flex;
+      }
+    }
+
+    .mobileButtons {
+      width: 70px;
+      height: 70px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      border-radius: 50%;
+      border: none;
+      background: radial-gradient(circle at 30% 30%, #00ffe1, #003b95);
+      color: #fff;
+      box-shadow: 0 0 10px #00ffe1, 0 0 20px #00ffe1;
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
+    }
+
+    .mobileButtons:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 5px #00ffe1, 0 0 10px #00ffe1;
+    }
+
+    .mobileRow {
+      display: flex;
+      gap: 15px;
+    }
+
+    .menuButtons, .overButtons {
+      display: flex;
+      justify-content: center;
+      flex-direction: column; /* Stack buttons vertically */
+      align-items: center;     /* Center horizontally */
+      gap: 20px;               /* Add space between buttons */
+      margin-top: 20px;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    #SnakeM, #OverHeader, #About {
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #00ffea, #5b42f3, #ff3c83);
+      background-clip: text;               /* Add this line */
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: pulseText 3s infinite;
+      margin-bottom: 20px;
+    }
+
+    .hidden { display: none; }
+
+    button {
+      font-size: 1rem;
+      padding: 10px 25px;
+      background: linear-gradient(135deg, #1f1f1f, #333);
+      color: #fff;
+      border: 2px solid rgb(65, 119, 234);
+      cursor: pointer;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, rgb(172, 15, 91), #4516b4);
+      transform: scale(1.05);
+      border-color: rgb(0, 240, 240);
+    }
+
+  </style>
+</head>
+<body>
+  
+
+  <!-- ✅ Main Menu -->
+  <div id="menu" class="overlay">
+    <h1 id="SnakeM">SNAKE GAME</h1>
+    <div class="menuButtons">
+      <button onclick="selectDifficulty()">Start Game</button>
+      <button onclick="showInstruction()">Instructions</button>
+      <button onclick="showAbout()">About</button> <!-- 👈 New button -->
+    </div>
+  </div>
+
+  <!-- ✅ Game Screen -->
+  <div id="game" class="hidden">
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+    <div id="controls">
+      <button onclick="pauseGame()">Pause</button>
+      <button onclick="resumeGame()">Resume</button>
+      <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+    </div>
+    
+    <!-- ✅ Mobile Controls -->
+    <!-- ✅ Mobile Controls -->
+    <div id="mobileControls">
+      <div class="mobileRow">
+        <button class="mobileButtons" onclick="move('UP')">⬆️</button>
+      </div>
+      <div class="mobileRow">
+        <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
+        <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
+        <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameOverScreen" class="overlay hidden">
+    <h2 id="finalScore">Game Over!</h2>
+    <button onclick="restartGame()">Restart</button>
+  </div>
+
+  <script>
+    const gameDiv = document.getElementById('game');
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const tileSize = 20;
+    const cols = canvas.width / tileSize;
+    const rows = canvas.height / tileSize;
+
+    let x, y, dx, dy, score, nTail, tail, fruit, obstacles, gameOver, gameNo = 0, isPaused = false;
+
+    let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false;
+
+    function initGame() {
+      x = Math.floor(cols / 2);
+      y = Math.floor(rows / 2);
+      dx = dy = 0;
+      score = 0;
+      nTail = 0;
+      tail = [];
+      fruit = Array.from({ length: 3 }, () => ({
+        x: Math.floor(Math.random() * cols),
+        y: Math.floor(Math.random() * rows)
+      }));
+      obstacles = Array.from({ length: 15 }, () => ({
+        x: Math.floor(Math.random() * cols),
+        y: Math.floor(Math.random() * rows)
+      }));
+      gameOver = false;
+    }
+
+    function showMenu() {
+      document.getElementById("menu").style.display = "flex"; // 👈 restore buttons
+      gameDiv.classList.add("hidden");
+      document.getElementById("gameOver").classList.add("hidden");
+      clearInterval(gameInterval);
+      gameRunning = false;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "white";
+      ctx.font = "20px monospace";
+      ctx.fillText(`Score: ${score}`, 10, 20);
+
+      ctx.fillStyle = "lime";
+      ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+
+      ctx.fillStyle = "green";
+      for (let i = 0; i < tail.length; i++) {
+        ctx.fillRect(tail[i].x * tileSize, tail[i].y * tileSize, tileSize, tileSize);
+      }
+
+      ctx.fillStyle = "red";
+      fruit.forEach(f => {
+        ctx.fillRect(f.x * tileSize, f.y * tileSize, tileSize, tileSize);
+      });
+
+      ctx.fillStyle = "gray";
+      obstacles.forEach(o => {
+        ctx.fillRect(o.x * tileSize, o.y * tileSize, tileSize, tileSize);
+      });
+    }
+
+    function update() {
+      if (gameOver || isPaused) return;
+
+      tail.unshift({ x, y });
+      if (tail.length > nTail) tail.pop();
+
+      x += dx;
+      y += dy;
+
+      if (
+        x < 0 || x >= cols || y < 0 || y >= rows ||
+        tail.some(t => t.x === x && t.y === y) ||
+        obstacles.some(o => o.x === x && o.y === y)
+      ) {
+        gameOver = true;
+      }
+
+      for (let i = 0; i < fruit.length; i++) {
+        if (fruit[i].x === x && fruit[i].y === y) {
+          score += 10;
+          nTail++;
+          fruit[i] = {
+            x: Math.floor(Math.random() * cols),
+            y: Math.floor(Math.random() * rows)
+          };
+        }
+      }
+
+      if (gameOver) endGame();
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);
+      gameRunning = false;
+      
+      clearInterval(gameInterval);
+      document.getElementById("finalScore").innerText = "Game Over! Score: " + score;
+      document.getElementById("gameOverScreen").classList.remove("hidden");
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+    }
+
+    function startGame() {
+      initGame();
+      gameNo++;
+      isPaused = false;
+      gameRunning = true;
+
+      document.getElementById("menu").classList.add("hidden");
+      document.getElementById("gameOverScreen").classList.add("hidden");
+      gameDiv.classList.remove("hidden");
+      
+      gameInterval = setInterval(gameLoop, speed);
+    }
+
+    function pauseGame() { isPaused = true; }
+    function resumeGame() { if (gameRunning) isPaused = false; }
+
+    function restartGame() {
+      startGame();
+    }
+
+    function selectDifficulty() {
+      // Show the difficulty selection modal
+      document.getElementById("difficultyModal").style.display = "flex";
+    }
+
+    function setDifficulty(choice) {
+      if (choice === 'e') {
+        speed = 130; difficulty = "Easy"; obstacleCount = 15;
+      } else if (choice === 'm') {
+        speed = 105; difficulty = "Medium"; obstacleCount = 20;
+      } else if (choice === 'h') {
+        speed = 80; difficulty = "Hard"; obstacleCount = 25;
+      }
+      document.getElementById("difficultyModal").style.display = "none";
+      startGame();
+    }
+
+    function showInstruction() {
+      document.getElementById("intructionModal").style.display = "flex";
+    }
+
+    function closeInstructions() {
+      document.getElementById("intructionModal").style.display = "none";
+    }
+
+    function showAbout() {
+      document.getElementById("aboutModal").style.display = "flex";
+    }
+
+    function closeAbout() {
+      document.getElementById("aboutModal").style.display = "none";
+    }
+
+    window.addEventListener("keydown", e => {
+      switch (e.key) {
+        case "ArrowUp": if (dy === 0) { dx = 0; dy = -1; } break;
+        case "ArrowDown": if (dy === 0) { dx = 0; dy = 1; } break;
+        case "ArrowLeft": if (dx === 0) { dx = -1; dy = 0; } break;
+        case "ArrowRight": if (dx === 0) { dx = 1; dy = 0; } break;
+      }
+    });
+  </script>
+
+  <div id="difficultyModal" style="position:fixed; top: 0; left:0; width:100vw; height:100vh; background:#000000cc; color:white; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000;">
+    <h2 id="difficulty">Select Difficulty</h2>
+    <div>
+      <button onclick="setDifficulty('e')">Easy</button>
+      <button onclick="setDifficulty('m')">Medium</button>
+      <button onclick="setDifficulty('h')">Hard</button>
+    </div>
+  </div>
+
+  <div id="intructionModal" class="modal">
+    <div class="modal-content">
+      <h2 id="About">Instructions</h2>
+      <p>
+        🐍 1. It is the classic "Snake Game" remake.
+        ⬆️ 2. Press 'Arrow Keys' to move the snake.<br>
+        🐍 3. Eat the fruits (0) to grow your snake.<br>
+        ⚠️ 4. Avoid walls (|), yourself (o), and obstacles (X).<br>
+        🚀 5. Press [P] or [Pause] button to 'Pause'.<br>
+        🚀 6. Press [P] or [Resume] button to 'Resume'.<br>
+      </p>
+      <button onclick="closeInstructions()">Close</button>
+    </div>
+  </div>
+
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <h2 id="About">About This Game</h2>
+      <p>
+        🎮 Welcome to the classic Snake Game remake!<br>
+        🚀 Built with HTML, CSS, and JavaScript.<br>
+        🐍 Eat the fruits (0) to grow your snake.<br>
+        ⚠️ Avoid walls, yourself, and obstacles (X).<br><br>
+        👨‍💻 Developed by: Subhajit<br>
+        🌐 GitHub: <a href="https://github.com/Subhajit2425" target="_blank">Click Here</a>
+      </p>
+      <button onclick="closeAbout()">Close</button>
+    </div>
+  </div>
+
+</body>
+</html>
