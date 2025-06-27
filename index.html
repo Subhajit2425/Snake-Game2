@@ -211,7 +211,7 @@
     const cols = canvas.width / tileSize;
     const rows = canvas.height / tileSize;
 
-    let x, y, dx, dy, score, nTail, tail, fruit, obstacles, gameOver, gameNo = 0, isPaused = false;
+    let x, y, dx, dy, score, nTail, tail, fruit, obstacles, gameOver = false, dir = '', gameNo = 0, isPaused = false;
 
     let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false;
 
@@ -221,6 +221,7 @@
       dx = dy = 0;
       score = 0;
       nTail = 0;
+      dir = '';
       tail = [];
       fruit = Array.from({ length: 3 }, () => ({
         x: Math.floor(Math.random() * cols),
@@ -275,6 +276,13 @@
 
       x += dx;
       y += dy;
+
+      switch (dir) {
+        case 'LEFT': x--; break;
+        case 'RIGHT': x++; break;
+        case 'UP': y--; break;
+        case 'DOWN': y++; break;
+      }
 
       if (
         x < 0 || x >= cols || y < 0 || y >= rows ||
@@ -365,14 +373,47 @@
       document.getElementById("aboutModal").style.display = "none";
     }
 
-    window.addEventListener("keydown", e => {
-      switch (e.key) {
-        case "ArrowUp": if (dy === 0) { dx = 0; dy = -1; } break;
-        case "ArrowDown": if (dy === 0) { dx = 0; dy = 1; } break;
-        case "ArrowLeft": if (dx === 0) { dx = -1; dy = 0; } break;
-        case "ArrowRight": if (dx === 0) { dx = 1; dy = 0; } break;
+    function move(newDir) {
+      if (!gameRunning) return; // game not started yet
+
+      // Only allow first direction to start game
+      if (!dir) {
+        dir = newDir;
+        gameInterval = setInterval(gameLoop, speed);
+      } else {
+        // Prevent reverse movement
+        if (
+          (newDir === 'UP' && dir !== 'DOWN') ||
+          (newDir === 'DOWN' && dir !== 'UP') ||
+          (newDir === 'LEFT' && dir !== 'RIGHT') ||
+          (newDir === 'RIGHT' && dir !== 'LEFT')
+        ) {
+          dir = newDir;
+        }
       }
+    }
+
+    // ✅ Keyboard Controls
+    window.addEventListener("keydown", e => {
+      const key = e.code;
+
+      const startIfNeeded = (newDir, blockDir) => {
+        if (!dir && gameRunning) {
+          dir = newDir;
+        } else if (dir !== blockDir) {
+          dir = newDir;
+        }
+      };
+
+      if (key === "ArrowUp") startIfNeeded("UP", "DOWN");
+      else if (key === "ArrowDown") startIfNeeded("DOWN", "UP");
+      else if (key === "ArrowLeft") startIfNeeded("LEFT", "RIGHT");
+      else if (key === "ArrowRight") startIfNeeded("RIGHT", "LEFT");
+      else if (key === "KeyP") isPaused = !isPaused;
+      else if (key === "KeyR" && gameOver) startGame();
+      else if (key === "KeyQ" && gameOver) showMenu();
     });
+    
   </script>
 
   <div id="difficultyModal" style="position:fixed; top: 0; left:0; width:100vw; height:100vh; background:#000000cc; color:white; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000;">
