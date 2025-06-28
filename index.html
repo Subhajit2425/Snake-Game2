@@ -2,9 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snake Game 2</title>
+
+  <!-- ✅ Viewport for mobile responsiveness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      touch-action: none;
+    }
+
     body {
       background-color: black;
       color: white;
@@ -21,6 +33,9 @@
 
     canvas {
       border: 2px solid white;
+      background-color: black;
+      display: block;
+      margin: 0 auto;
       background-color: black;
     }
 
@@ -84,6 +99,14 @@
     @media (max-width: 768px) {
       #mobileControls {
         display: flex;
+      }
+      canvas {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #gameScaleBox {
+        transform: scale(calc(100vw / 360));
       }
     }
 
@@ -178,6 +201,21 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    #gameWrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    #gameScaleBox {
+      transform-origin: top center;
+      width: 360px;
+      height: 580px; /* canvas + button height */
+    }
+
   </style>
 </head>
 <body>
@@ -196,23 +234,26 @@
 
   <!-- ✅ Game Screen -->
   <div id="game" class="hidden">
-    <canvas id="gameCanvas" width="400" height="500"></canvas>
-    <div id="controls">
-      <button onclick="pauseGame()">Pause</button>
-      <button onclick="resumeGame()">Resume</button>
-      <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
-    </div>
+    <div id="gameWrapper">
+      <div id="gameScaleBox"> <!-- ✅ Add wrapper -->
+        <canvas id="gameCanvas"></canvas>
+        <div id="controls">
+          <button onclick="pauseGame()">Pause</button>
+          <button onclick="resumeGame()">Resume</button>
+          <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+        </div>  
     
-    <!-- ✅ Mobile Controls -->
-    <!-- ✅ Mobile Controls -->
-    <div id="mobileControls">
-      <div class="mobileRow">
-        <button class="mobileButtons" onclick="move('UP')">⬆️</button>
-      </div>
-      <div class="mobileRow">
-        <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
-        <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
-        <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
+        <!-- ✅ Mobile Controls -->
+        <div id="mobileControls">
+          <div class="mobileRow">
+            <button class="mobileButtons" onclick="move('UP')">⬆️</button>
+          </div>
+          <div class="mobileRow">
+            <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
+            <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
+            <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -239,9 +280,14 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
+    // ✅ Fixed canvas size (ideal layout for your game)
+    canvas.width = 360;
+    canvas.height = 480;
+
     const tileSize = 15;
-    const cols = canvas.width / tileSize;
-    const rows = canvas.height / tileSize;
+    let cols = Math.floor(canvas.width / tileSize);
+    let rows = Math.floor(canvas.height / tileSize);
+
 
     let x, y, dx, dy, score, nTail, tail, fruit, fruitNo = 5, obstacles, gameOver = false, dir = '', gameNo = 0, isPaused = false;
 
@@ -502,7 +548,7 @@
 
     // ✅ Load high score
     highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
-    
+
   </script>
 
   <div id="difficultyModal" style="position:fixed; top: 0; left:0; width:100vw; height:100vh; background:#000000cc; color:white; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000;">
