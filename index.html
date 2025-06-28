@@ -107,7 +107,7 @@
       }
 
       #gameScaleBox {
-        transform: scale(calc(100vh / 580)); /* 580 = 480 canvas + ~100px buttons */
+        transform: scale(calc(100vh / 540)); /* match updated height */
         transform-origin: top center;
       }
 
@@ -211,16 +211,18 @@
     #gameWrapper {
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start; /* 👈 changed from center */
       height: 100vh;
       width: 100vw;
       overflow: hidden;
+      padding: 0;
+      margin: 0;
     }
 
     #gameScaleBox {
       transform-origin: top center;
       width: 360px;
-      height: 580px; /* canvas (480) + space for 3 rows of buttons */
+      height: 540px; /* 👈 Adjusted height */
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
