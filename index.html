@@ -596,10 +596,7 @@
     
     function resizeGameArea() {
       const gameScaleBox = document.getElementById("gameScaleBox");
-      const targetHeight = 540; // 480 (canvas) + 60 (controls)
-
-      // Calculate scale based on real available height
-      const scale = window.innerHeight / targetHeight;
+      const scale = Math.min(window.innerWidth / 360, window.innerHeight / 540);
       gameScaleBox.style.transform = `scale(${scale})`;
       gameScaleBox.style.transformOrigin = "top center";
     }
