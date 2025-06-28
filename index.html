@@ -4,7 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snake Game 2</title>
+
+  <!-- ✅ Viewport for mobile responsiveness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      touch-action: none;
+    }
+
     body {
       background-color: black;
       color: white;
@@ -19,8 +32,18 @@
       height: 100vh;
     }
 
+    /* Wrapper for centering and controlling layout */
+    #gameWrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     canvas {
       border: 2px solid white;
+      background-color: black;
+      display: block;
+      margin: 0 auto;
       background-color: black;
     }
 
@@ -84,6 +107,10 @@
     @media (max-width: 768px) {
       #mobileControls {
         display: flex;
+      }
+      canvas {
+        width: 100vw;
+        height: 100vh;
       }
     }
 
@@ -162,6 +189,11 @@
       border-color: rgb(0, 240, 240);
     }
 
+    .exitBtn {
+      background: linear-gradient(135deg, #C42B1C, #5a0e09);
+      border-color:  rgb(65, 119, 234);
+    }
+
     @keyframes pulseText {
       0% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.8; transform: scale(1.05); }
@@ -191,11 +223,13 @@
 
   <!-- ✅ Game Screen -->
   <div id="game" class="hidden">
-    <canvas id="gameCanvas" width="400" height="500"></canvas>
-    <div id="controls">
-      <button onclick="pauseGame()">Pause</button>
-      <button onclick="resumeGame()">Resume</button>
-      <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+    <div id="gameWrapper">
+      <canvas id="gameCanvas"></canvas>
+      <div id="controls">
+        <button onclick="pauseGame()">Pause</button>
+        <button onclick="resumeGame()">Resume</button>
+        <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+      </div>
     </div>
     
     <!-- ✅ Mobile Controls -->
@@ -234,9 +268,8 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    const tileSize = 15;
-    const cols = canvas.width / tileSize;
-    const rows = canvas.height / tileSize;
+    let tileSize = 15;
+    let cols, rows;
 
     let x, y, dx, dy, score, nTail, tail, fruit, fruitNo = 5, obstacles, gameOver = false, dir = '', gameNo = 0, isPaused = false;
 
@@ -304,6 +337,30 @@
 
       gameOver = false;
     }
+
+    function resizeCanvasForDevice() {
+      const canvas = document.getElementById("gameCanvas");
+
+      if (window.innerWidth <= 768) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      } else {
+        canvas.width = 400;
+        canvas.height = 500;
+      }
+
+      // ⚠️ Recalculate rows/cols after canvas is set
+      cols = Math.floor(canvas.width / tileSize);
+      rows = Math.floor(canvas.height / tileSize);
+    }
+
+
+    // Call it on load and resize
+    window.addEventListener("load", () => {
+      resizeCanvasForDevice();
+      startGame(); // or initGame()
+    });
+    window.addEventListener("resize", resizeCanvasForDevice);
 
     function showMenu() {
       document.getElementById("menu").style.display = "flex"; // 👈 restore buttons
@@ -497,7 +554,7 @@
 
     // ✅ Load high score
     highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
-    
+
   </script>
 
   <div id="difficultyModal" style="position:fixed; top: 0; left:0; width:100vw; height:100vh; background:#000000cc; color:white; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000;">
