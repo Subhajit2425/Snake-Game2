@@ -101,24 +101,24 @@
         overflow: hidden;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
       }
 
       #gameScaleBox {
-        width: 100vw;
-        height: 100vh;
-        transform: none;
+        width: 360px;
+        height: 540px;
+        transform: scale(
+          min(
+            calc(100vw / 360),
+            calc(100vh / 540)
+          )
+        );
         transform-origin: top center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
       }
 
       canvas {
-        width: 90vw;
-        height: auto;
-        max-height: 80vh;
+        width: 360px;
+        height: 480px;
       }
     }
 
@@ -142,8 +142,6 @@
       #gameScaleBox {
         transform: scale(calc(100vh / 580));
         transform-origin: top center;
-        width: 360px;
-        height: 540px;
       }
 
       canvas {
@@ -256,10 +254,13 @@
 
     #gameScaleBox {
       transform-origin: top center;
+      width: 360px;
+      height: 540px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
     }
+
   </style>
 </head>
 <body>
