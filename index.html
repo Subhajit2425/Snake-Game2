@@ -288,15 +288,17 @@
       fruit = [];
       obstacles = [];
 
+      let snakeHead = { x, y };
+
       // Generate 3 non-overlapping fruits
       for (let i = 0; i < fruitNo; i++) {
-        let pos = getValidPosition({ x, y }, tail, fruit, obstacles, cols, rows);
+        let pos = getValidPosition(snakeHead, tail, fruit, obstacles, cols, rows);
         fruit.push(pos);
       }
 
       // Generate non-overlapping obstacles
       for (let i = 0; i < (obstacleCount || 5); i++) {
-        let pos = getValidPosition({ x, y }, tail, fruit, obstacles, cols, rows);
+        let pos = getValidPosition(snakeHead, tail, fruit, obstacles, cols, rows);
         obstacles.push(pos);
       }
 
@@ -380,6 +382,11 @@
       clearInterval(gameInterval);
       gameRunning = false;
       gameOverSound.play();
+
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('snakeHighScore', highScore);
+      }
       
       gameDiv.classList.add("hidden");
       document.getElementById("gameOver").classList.remove("hidden");
@@ -487,6 +494,9 @@
       else if (key === "KeyR" && gameOver) startGame();
       else if (key === "KeyQ" && gameOver) showMenu();
     });
+
+    // ✅ Load high score
+    highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
     
   </script>
 
