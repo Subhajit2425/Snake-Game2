@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>Snake Game 2</title>
-
-  <!-- ✅ Viewport for mobile responsiveness -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 
   <style>
@@ -36,7 +34,6 @@
       background-color: black;
       display: block;
       margin: 0 auto;
-      background-color: black;
     }
 
     .overlay {
@@ -96,7 +93,7 @@
       margin-top: 20px;
     }
 
-    @media (max-width: 768px) {
+    @media (pointer: coarse) and (max-width: 768px) and (orientation: portrait) {
       #mobileControls {
         display: flex;
       }
@@ -104,10 +101,13 @@
       #gameWrapper {
         height: 100vh;
         overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: start;
       }
 
       #gameScaleBox {
-        transform: scale(calc(100vh / 540)); /* match updated height */
+        transform: scale(calc((100vh - 30px) / 580));
         transform-origin: top center;
       }
 
@@ -144,9 +144,9 @@
     .menuButtons, .overButtons {
       display: flex;
       justify-content: center;
-      flex-direction: column; /* Stack buttons vertically */
-      align-items: center;     /* Center horizontally */
-      gap: 20px;               /* Add space between buttons */
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
       margin-top: 20px;
     }
 
@@ -157,11 +157,17 @@
       margin-top: 4px;
     }
 
+    @media (pointer: fine) and (min-width: 769px) {
+      #controls {
+        margin-bottom: 30px; /* ✅ Bottom space only on PC */
+      }
+    }
+
     #SnakeM, #OverHeader, #About {
       font-size: 2.5rem;
       letter-spacing: 2px;
       background: linear-gradient(90deg, #00ffea, #5b42f3, #ff3c83);
-      background-clip: text;               /* Add this line */
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: pulseText 3s infinite;
@@ -211,7 +217,7 @@
     #gameWrapper {
       display: flex;
       justify-content: center;
-      align-items: flex-start; /* 👈 changed from center */
+      align-items: flex-start;
       height: 100vh;
       width: 100vw;
       overflow: hidden;
@@ -222,12 +228,11 @@
     #gameScaleBox {
       transform-origin: top center;
       width: 360px;
-      height: 540px; /* 👈 Adjusted height */
+      height: 540px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
     }
-
 
   </style>
 </head>
@@ -561,6 +566,20 @@
 
     // ✅ Load high score
     highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+
+    
+    function resizeGameArea() {
+      const gameScaleBox = document.getElementById("gameScaleBox");
+      const targetHeight = 540; // 480 (canvas) + 60 (controls)
+
+      // Calculate scale based on real available height
+      const scale = window.innerHeight / targetHeight;
+      gameScaleBox.style.transform = `scale(${scale})`;
+      gameScaleBox.style.transformOrigin = "top center";
+    }
+
+    window.addEventListener('resize', resizeGameArea);
+    window.addEventListener('load', resizeGameArea);
 
   </script>
 
