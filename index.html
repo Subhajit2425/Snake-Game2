@@ -107,9 +107,15 @@
       }
 
       #gameScaleBox {
-        transform: scale(calc(100vh / 540)); /* match updated height */
+        transform: scale(
+          min(
+            calc(100vw / 360),
+            calc(100vh / 540)
+          )
+        );
         transform-origin: top center;
       }
+
 
       canvas {
         width: 360px;
@@ -274,7 +280,7 @@
   <!-- ✅ Game Over Screen -->
   <div id="gameOver" class="hidden">
     <div style="height: 5vh;"></div>
-  <div id="OverHeader"> !! Game Over !!</div>
+  <div id="OverHeader">!! Game Over !!</div>
     <h2 id="gameOverText"></h2>
     <div class="overButtons">
       <button onclick="startGame()">Restart</button>
