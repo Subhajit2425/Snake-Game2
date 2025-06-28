@@ -190,23 +190,29 @@
     #gameWrapper {
       display: flex;
       justify-content: center;
-      align-items: flex-start; /* 👈 changed from center */
-      height: 100vh;
+      align-items: flex-start;
+      height: 100dvh;
       width: 100vw;
       overflow: hidden;
-      padding: 0;
-      margin: 0;
+      padding: 10px 0; /* Add small top/bottom space */
+      box-sizing: border-box;
     }
 
+
     #gameScaleBox {
+      transform: scale(
+        min(
+          calc((100vw - 10px) / 360),
+          calc((100vh - 80px) / 540)
+        )
+      );
       transform-origin: top center;
       width: 360px;
-      height: 540px; /* 👈 Adjusted height */
+      height: 540px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-    }
-    
+    } 
   </style>
 </head>
 <body>
