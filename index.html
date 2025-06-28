@@ -140,9 +140,8 @@
 
     .hidden { display: none; }
 
-    #gameOver {
+    #menu, #game, #gameOver {
       text-align: center;
-      width: 100vh;
     }
 
     button {
@@ -150,7 +149,7 @@
       padding: 10px 25px;
       background: linear-gradient(135deg, #1f1f1f, #333);
       color: #fff;
-      border: 2px solid rgb(65, 119, 234);
+      border: 2px solid #8562b3;
       cursor: pointer;
       border-radius: 30px;
       transition: all 0.3s ease;
@@ -225,6 +224,11 @@
     </div>
   </div>
 
+  <!-- 🔊 Sound Effects -->
+  <audio id="eatSound" src="https://www.soundjay.com/human/bone-crack-1.mp3"></audio>
+  <audio id="gameOverSound" src="https://www.soundjay.com/buttons/button-4.mp3"></audio>
+  <audio id="startSound" src="https://www.soundjay.com/buttons/button-11.mp3"></audio>
+
   <script>
     const gameDiv = document.getElementById('game');
     const canvas = document.getElementById("gameCanvas");
@@ -237,6 +241,10 @@
     let x, y, dx, dy, score, nTail, tail, fruit, fruitNo = 5, obstacles, gameOver = false, dir = '', gameNo = 0, isPaused = false;
 
     let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false;
+
+    const eatSound = document.getElementById('eatSound');
+    const gameOverSound = document.getElementById('gameOverSound');
+    const startSound = document.getElementById('startSound');
 
 
     function isOccupied(x, y, snakeHead, tail, fruits,  obstacles) {
@@ -357,6 +365,7 @@
         if (fruit[i].x === x && fruit[i].y === y) {
           score += 10;
           nTail++;
+          eatSound.play();
           fruit[i] = {
             x: Math.floor(Math.random() * cols),
             y: Math.floor(Math.random() * rows)
@@ -370,6 +379,7 @@
     function endGame() {
       clearInterval(gameInterval);
       gameRunning = false;
+      gameOverSound.play();
       
       gameDiv.classList.add("hidden");
       document.getElementById("gameOver").classList.remove("hidden");
@@ -382,6 +392,7 @@
     }
 
     function startGame() {
+      startSound.play();
       initGame();
       gameNo++;
       isPaused = false;
@@ -409,10 +420,13 @@
     function setDifficulty(choice) {
       if (choice === 'e') {
         speed = 175; difficulty = "Easy"; obstacleCount = 20;
+        canvas.style.borderColor = "#87CEEB"
       } else if (choice === 'm') {
         speed = 150; difficulty = "Medium"; obstacleCount = 35;
+        canvas.style.borderColor = "#6495ED"
       } else if (choice === 'h') {
         speed = 125; difficulty = "Hard"; obstacleCount = 50;
+        canvas.style.borderColor = "#4682B4"
       }
       document.getElementById("difficultyModal").style.display = "none";
       startGame();
@@ -489,12 +503,13 @@
     <div class="modal-content">
       <h2 id="About">Instructions</h2>
       <p>
-        🐍 1. It is the classic "Snake Game" remake.
-        ⬆️ 2. Press 'Arrow Keys' to move the snake.<br>
-        🐍 3. Eat the fruits (0) to grow your snake.<br>
-        ⚠️ 4. Avoid walls (|), yourself (o), and obstacles (X).<br>
-        🚀 5. Press [P] or [Pause] button to 'Pause'.<br>
-        🚀 6. Press [P] or [Resume] button to 'Resume'.<br>
+        🐍 1. The snake (🟩) starts at the center.<br>
+        ⬆️ 2. Use the arrow keys to move the snake.<br>
+        🍎 3. Eat the fruits (🟥) to grow longer and score points.<br>
+        ⚠️ 4. Avoid hitting walls, yourself (🟩), or obstacles (⬛).<br>
+        ⏸️ 5. Press [P] or tap the 'Pause' button to pause the game.<br>
+        ▶️ 6. Press [P] again or tap the 'Resume' button to continue.<br>
+
       </p>
       <button onclick="closeInstructions()">Close</button>
     </div>
@@ -504,12 +519,12 @@
     <div class="modal-content">
       <h2 id="About">About This Game</h2>
       <p>
-        🎮 Welcome to the classic Snake Game remake!<br>
-        🚀 Built with HTML, CSS, and JavaScript.<br>
-        🐍 Eat the fruits (0) to grow your snake.<br>
-        ⚠️ Avoid walls, yourself, and obstacles (X).<br><br>
-        👨‍💻 Developed by: Subhajit<br>
-        🌐 GitHub: <a href="https://github.com/Subhajit2425" target="_blank">Click Here</a>
+        🎮 Welcome to the Classic Snake Game — Remade with a Modern Touch!<br>
+        🚀 The snake (🟩) starts at the center of the arena.<br>
+        🐍 Eat the fruits (🟥) to grow longer and increase your score.<br>
+        ⚠️ Avoid crashing into walls, yourself, or obstacles (⬛).<br><br>
+        👨‍💻 Developed with ❤️ by <strong>Subhajit</strong><br>
+        🌐 GitHub: <a href="https://github.com/Subhajit2425" target="_blank">Visit My GitHub</a>
       </p>
       <button onclick="closeAbout()">Close</button>
     </div>
