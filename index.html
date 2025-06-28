@@ -96,27 +96,6 @@
       margin-top: 20px;
     }
 
-    @media (max-width: 768px) {
-      #mobileControls {
-        display: flex;
-      }
-
-      #gameScaleBox {
-        transform: scale(
-          min(
-            calc(100vw / 360),
-            calc(100vh / 540)
-          )
-        );
-        transform-origin: top center;
-      }
-
-      canvas {
-        width: 360px;
-        height: 480px;
-      }
-    }
-
     .mobileButtons {
       width: 70px;
       height: 70px;
@@ -560,6 +539,40 @@
 
     // ✅ Load high score
     highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+
+
+    function resizeGame() {
+      const scaleBox = document.getElementById('gameScaleBox');
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const desiredWidth = 360;
+      const desiredHeight = 540;
+
+      const scale = Math.min(vw / desiredWidth, vh / desiredHeight);
+
+      scaleBox.style.transform = `scale(${scale})`;
+      scaleBox.style.transformOrigin = "top center";
+    }
+
+    window.addEventListener("resize", resizeGame);
+    window.addEventListener("load", resizeGame);
+
+
+    // Detect if it's a touch device (mobile/tablet)
+    function isMobileDevice() {
+      return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+
+    // Show mobile controls only on mobile
+    window.addEventListener('load', () => {
+      const mobileControls = document.getElementById('mobileControls');
+      if (isMobileDevice()) {
+        mobileControls.style.display = 'flex';
+      } else {
+        mobileControls.style.display = 'none';
+      }
+    });
 
   </script>
 
