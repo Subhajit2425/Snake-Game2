@@ -100,13 +100,20 @@
       #mobileControls {
         display: flex;
       }
-      canvas {
-        width: 100vw;
+
+      #gameWrapper {
         height: 100vh;
+        overflow: hidden;
       }
 
       #gameScaleBox {
-        transform: scale(calc(100vw / 360));
+        transform: scale(calc(100vh / 580)); /* 580 = 480 canvas + ~100px buttons */
+        transform-origin: top center;
+      }
+
+      canvas {
+        width: 360px;
+        height: 480px;
       }
     }
 
@@ -213,8 +220,12 @@
     #gameScaleBox {
       transform-origin: top center;
       width: 360px;
-      height: 580px; /* canvas + button height */
+      height: 580px; /* canvas (480) + space for 3 rows of buttons */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
+
 
   </style>
 </head>
