@@ -27,6 +27,7 @@
       flex-direction: column;
       align-items: center;
       height: 100vh;
+      height: var(--app-height);
     }
 
     canvas {
@@ -50,11 +51,14 @@
     }
 
     #mobileControls {
-      margin-top: 20px;
+      margin-top: auto; /* ✅ Pushes to bottom of game box */
+      padding-bottom: 10px; /* ✅ Some breathing room */
       display: none;
       flex-direction: column;
       align-items: center;
       gap: 10px;
+      max-height: 40vh; /* ✅ Prevent overflow on small screens */
+      overflow-y: auto; /* ✅ Allow scroll if needed */
     }
 
     .modal {
@@ -182,6 +186,10 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    :root {
+      --app-height: 100vh; /* fallback */
     }
 
     #gameWrapper {
@@ -363,21 +371,16 @@
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      
-      ctx.fillStyle = "white";
+      ctx.save();
       ctx.font = "20px monospace";
+      ctx.fillStyle = "white";
+      ctx.textAlign = "left";
+      ctx.fillText(`Score: ${score}`, 10, 20);
 
-      const scoreText = `Score: ${score}`;
-      const highScoreText = `High Score: ${highScore}`;
-
-      // Draw current score
-      ctx.fillText(scoreText, 10, 20);
-
-      // Calculate the width of the score text to place high score after it
-      const scoreWidth = ctx.measureText(scoreText).width + 40; // +20 for some spacing
-
-      // Draw high score
-      ctx.fillText(highScoreText, 10 + scoreWidth, 20);
+      ctx.textAlign = "right";
+      ctx.fillText(`High Score: ${highScore}`, canvas.width - 10, 20);
+      ctx.textAlign = "left"; // reset alignment
+      ctx.restore(); // Restores all previous canvas state
 
 
       ctx.fillStyle = "lime";
@@ -388,10 +391,14 @@
         ctx.fillRect(tail[i].x * tileSize, tail[i].y * tileSize, tileSize, tileSize);
       }
 
-      ctx.fillStyle = "red";
+      ctx.font = `${tileSize + 1}px Arial`; // Adjust font size as needed
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
       fruit.forEach(f => {
-        ctx.fillRect(f.x * tileSize, f.y * tileSize, tileSize, tileSize);
+        ctx.fillText("🍎", f.x * tileSize + tileSize / 2, f.y * tileSize + tileSize / 2);
       });
+
 
       ctx.fillStyle = "gray";
       obstacles.forEach(o => {
@@ -424,7 +431,10 @@
         if (fruit[i].x === x && fruit[i].y === y) {
           score += 10;
           nTail++;
-          eatSound.play();
+          
+          const eatClone = eatSound.cloneNode();
+          eatClone.play();
+
           fruit[i] = getValidPosition({x, y}, tail, fruit, obstacles, cols, rows);
         }
       }
@@ -607,7 +617,14 @@
       }
     });
 
+    function setAppHeight() {
+      const appHeight = window.innerHeight;
+      document.documentElement.style.setProperty('--app-height', `${appHeight}px`);
+      resizeGame(); // ensure game scales correctly after height update
+    }
 
+    window.addEventListener('resize', setAppHeight);
+    window.addEventListener('load', setAppHeight);
   </script>
 
   <div id="difficultyModal" style="position:fixed; top: 0; left:0; width:100vw; height:100vh; background:#000000cc; color:white; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000;">
