@@ -27,7 +27,7 @@
       flex-direction: column;
       align-items: center;
       height: 100vh;
-      height: var(--app-height);
+      
     }
 
     canvas {
@@ -51,14 +51,11 @@
     }
 
     #mobileControls {
-      margin-top: auto; /* ✅ Pushes to bottom of game box */
-      padding-bottom: 10px; /* ✅ Some breathing room */
+      margin-top: 20px;
       display: none;
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      max-height: 40vh; /* ✅ Prevent overflow on small screens */
-      overflow-y: auto; /* ✅ Allow scroll if needed */
     }
 
     .modal {
@@ -186,10 +183,6 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    :root {
-      --app-height: 100vh; /* fallback */
     }
 
     #gameWrapper {
@@ -617,14 +610,7 @@
       }
     });
 
-    function setAppHeight() {
-      const appHeight = window.innerHeight;
-      document.documentElement.style.setProperty('--app-height', `${appHeight}px`);
-      resizeGame(); // ensure game scales correctly after height update
-    }
 
-    window.addEventListener('resize', setAppHeight);
-    window.addEventListener('load', setAppHeight);
   </script>
 
   <div id="difficultyModal" style="position:fixed; top: 0; left:0; width:100vw; height:100vh; background:#000000cc; color:white; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000;">
