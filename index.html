@@ -34,7 +34,6 @@
       background-color: black;
       display: block;
       margin: 0;
-      background-color: black;
     }
 
     .overlay {
@@ -134,7 +133,7 @@
       margin-top: 4px;
     }
 
-    #SnakeM, #OverHeader, #About {
+    #SnakeM, #OverHeader, .About {
       font-size: 2.5rem;
       letter-spacing: 2px;
       background: linear-gradient(90deg, #00ffea, #5b42f3, #ff3c83);
@@ -286,7 +285,7 @@
 
     let x, y, dx, dy, score, nTail, tail, fruit, fruitNo = 5, obstacles, gameOver = false, dir = '', gameNo = 0, isPaused = false;
 
-    let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false;
+    let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false, obstacleCount = 20;
 
     const eatSound = document.getElementById('eatSound');
     const gameOverSound = document.getElementById('gameOverSound');
@@ -495,11 +494,11 @@
     }
 
     function showInstruction() {
-      document.getElementById("intructionModal").style.display = "flex";
+      document.getElementById("instructionModal").style.display = "flex";
     }
 
     function closeInstructions() {
-      document.getElementById("intructionModal").style.display = "none";
+      document.getElementById("instructionModal").style.display = "none";
     }
 
     function showAbout() {
@@ -587,11 +586,19 @@
 
     // Detect if it's a touch device (mobile/tablet)
     function isMobileDevice() {
-      return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+
+      // Check common mobile device indicators in user agent
+      const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+      const isMobileAgent = /android|iphone|ipad|ipod|opera mini|iemobile|mobile/i.test(ua);
+
+      return isTouch || isMobileAgent;
     }
 
+
     // Show mobile controls only on mobile
-    window.addEventListener('load', () => {
+    window.addEventListener('DOMContentLoaded', () => {
       const mobileControls = document.getElementById('mobileControls');
       if (isMobileDevice()) {
         mobileControls.style.display = 'flex';
@@ -599,6 +606,7 @@
         mobileControls.style.display = 'none';
       }
     });
+
 
   </script>
 
@@ -611,9 +619,9 @@
     </div>
   </div>
 
-  <div id="intructionModal" class="modal">
+  <div id="instructionModal" class="modal">
     <div class="modal-content">
-      <h2 id="About">Instructions</h2>
+      <h2 class="About">Instructions</h2>
       <p>
         🐍 1. The snake (🟩) starts at the center.<br>
         ⬆️ 2. Use the arrow keys to move the snake.<br>
@@ -629,14 +637,14 @@
 
   <div id="aboutModal" class="modal">
     <div class="modal-content">
-      <h2 id="About">About This Game</h2>
+      <h2 class="About">About This Game</h2>
       <p>
         🎮 Welcome to the Classic Snake Game — Remade with a Modern Touch!<br>
         🚀 The snake (🟩) starts at the center of the arena.<br>
         🐍 Eat the fruits (🟥) to grow longer and increase your score.<br>
         ⚠️ Avoid crashing into walls, yourself, or obstacles (⬛).<br><br>
         👨‍💻 Developed with ❤️ by <strong>Subhajit</strong><br>
-        🌐 GitHub: <a href="https://github.com/Subhajit2425" target="_blank">Visit My GitHub</a>
+        <code><strong>Made in India 🇮🇳</strong></code>
       </p>
       <button onclick="closeAbout()">Close</button>
     </div>
