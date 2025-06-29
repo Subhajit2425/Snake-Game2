@@ -51,13 +51,16 @@
     }
 
     #mobileControls {
-      display: none;
+      display: none; /* Shown only on mobile via JS */
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      margin-top: 12px; /* distance from canvas */
+      gap: 12px;
+      margin-top: 16px;
       padding-bottom: env(safe-area-inset-bottom);
+      position: relative;
+      z-index: 10;
     }
+
 
     .modal {
       display: none;
@@ -471,9 +474,18 @@
       document.getElementById("menu").style.display = "none";
       document.getElementById("gameOver").classList.add("hidden");
       gameDiv.classList.remove("hidden");
-      
+
+      // ✅ Show mobile controls only if mobile
+      const mobileControls = document.getElementById('mobileControls');
+      if (isMobileDevice()) {
+        mobileControls.style.display = 'flex';
+      } else {
+        mobileControls.style.display = 'none';
+      }
+
       gameInterval = setInterval(gameLoop, speed);
     }
+
 
     function pauseGame() { isPaused = true; }
     function resumeGame() { if (gameRunning) isPaused = false; }
@@ -620,18 +632,6 @@
 
       return isTouch || isMobileAgent;
     }
-
-
-    // Show mobile controls only on mobile
-    window.addEventListener('DOMContentLoaded', () => {
-      const mobileControls = document.getElementById('mobileControls');
-      if (isMobileDevice()) {
-        mobileControls.style.display = 'flex';
-      } else {
-        mobileControls.style.display = 'none';
-      }
-    });
-
 
   </script>
 
