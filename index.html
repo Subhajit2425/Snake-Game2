@@ -26,8 +26,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 100vh;
-      
+      height: var(--app-height);
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     canvas {
@@ -51,11 +51,12 @@
     }
 
     #mobileControls {
-      margin-top: 20px;
       display: none;
       flex-direction: column;
       align-items: center;
       gap: 10px;
+      margin-top: 12px; /* distance from canvas */
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     .modal {
@@ -189,7 +190,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      height: 100dvh;
+      height: var(--app-height);
       width: 100vw;
       overflow: hidden;
       box-sizing: border-box;
@@ -237,17 +238,17 @@
           <button onclick="resumeGame()">Resume</button>
           <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
         </div>
+      </div>
     
-        <!-- ✅ Mobile Controls -->
-        <div id="mobileControls">
-          <div class="mobileRow">
-            <button class="mobileButtons" onclick="move('UP')">⬆️</button>
-          </div>
-          <div class="mobileRow">
-            <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
-            <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
-            <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
-          </div>
+      <!-- ✅ Mobile Controls -->
+      <div id="mobileControls">
+        <div class="mobileRow">
+          <button class="mobileButtons" onclick="move('UP')">⬆️</button>
+        </div>
+        <div class="mobileRow">
+          <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
+          <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
+          <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
         </div>
       </div>
     </div>
@@ -591,6 +592,22 @@
    // ✅ Call resizeGame on page load and when resizing the window
     window.addEventListener("resize", resizeGame);
     window.addEventListener("load", resizeGame);
+
+    function setAppHeight() {
+      const appHeight = window.innerHeight;
+      document.documentElement.style.setProperty('--app-height', `${appHeight}px`);
+
+      // ✅ Fix for iOS/Safari and bottom cut-off
+      const missingSpace = window.innerHeight - document.documentElement.clientHeight;
+      document.body.style.paddingBottom = missingSpace > 0 ? `${missingSpace}px` : '0px';
+    }
+
+    window.addEventListener('load', setAppHeight);
+    window.addEventListener('resize', setAppHeight);
+
+
+    window.addEventListener('resize', setAppHeight);
+
 
     // Detect if it's a touch device (mobile/tablet)
     function isMobileDevice() {
