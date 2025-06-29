@@ -376,13 +376,18 @@
       ctx.restore(); // Restores all previous canvas state
 
 
-      ctx.fillStyle = "lime";
-      ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+      // 🐍 Head of the snake
+      ctx.font = `${tileSize + 2}px Arial`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("🟢", x * tileSize + tileSize / 2, y * tileSize + tileSize / 2);
 
-      ctx.fillStyle = "green";
+
+      // 🟩 Tail of the snake
       for (let i = 0; i < tail.length; i++) {
-        ctx.fillRect(tail[i].x * tileSize, tail[i].y * tileSize, tileSize, tileSize);
+        ctx.fillText("🟢", tail[i].x * tileSize + tileSize / 2, tail[i].y * tileSize + tileSize / 2);
       }
+
 
       ctx.font = `${tileSize + 1}px Arial`; // Adjust font size as needed
       ctx.textAlign = "center";
@@ -626,10 +631,10 @@
     <div class="modal-content">
       <h2 class="About">Instructions</h2>
       <p>
-        🐍 1. The snake (🟩) starts at the center.<br>
+        🐍 1. The snake (🟢) starts at the center.<br>
         ⬆️ 2. Use the arrow keys to move the snake.<br>
-        🍎 3. Eat the fruits (🟥) to grow longer and score points.<br>
-        ⚠️ 4. Avoid hitting walls, yourself (🟩), or obstacles (⬛).<br>
+        🍎 3. Eat the fruits (🍎) to grow longer and score points.<br>
+        ⚠️ 4. Avoid hitting walls, yourself (🟢), or obstacles (⬛).<br>
         ⏸️ 5. Press [P] or tap the 'Pause' button to pause the game.<br>
         ▶️ 6. Press [P] again or tap the 'Resume' button to continue.<br>
 
@@ -643,8 +648,8 @@
       <h2 class="About">About This Game</h2>
       <p>
         🎮 Welcome to the Classic Snake Game — Remade with a Modern Touch!<br>
-        🚀 The snake (🟩) starts at the center of the arena.<br>
-        🐍 Eat the fruits (🟥) to grow longer and increase your score.<br>
+        🚀 The snake (🟢) starts at the center of the arena.<br>
+        🐍 Eat the fruits (🍎) to grow longer and increase your score.<br>
         ⚠️ Avoid crashing into walls, yourself, or obstacles (⬛).<br><br>
         👨‍💻 Developed with ❤️ by <strong>Subhajit</strong><br>
         <code><strong>Made in India 🇮🇳</strong></code>
