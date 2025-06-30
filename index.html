@@ -235,8 +235,8 @@
     <div class="menuButtons">
       <button onclick="selectDifficulty()">Start Game</button>
       <button onclick="showUsers()">Community</button>
-      <button onclick="resetUser()">Reset User</button>
       <button onclick="showInstruction()">Instructions</button>
+      <button onclick="resetUser()">Reset User</button>
       <button onclick="showAbout()">About</button> <!-- 👈 New button -->
     </div>
   </div>
@@ -247,9 +247,9 @@
       <div id="gameScaleBox"> <!-- ✅ Add wrapper -->
         <canvas id="gameCanvas"></canvas>
         <div id="controls">
-          <button onclick="pauseGame()">Pause</button>
-          <button onclick="resumeGame()">Resume</button>
-          <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+          <button id="pauseBtn" onclick="togglePause()">Pause</button>
+          <button id="resumeBtn" onclick="togglePause()" style="display: none;">Resume</button>
+          <button class="exitBtn" onclick="if (!isPaused) togglePause(); showMenu()">Exit</button>
         </div>
     
         <!-- ✅ Mobile Controls -->
@@ -487,6 +487,9 @@
       gameDiv.classList.remove("hidden");
       
       gameInterval = setInterval(gameLoop, speed);
+
+      document.getElementById("pauseBtn").style.display = "inline-block";
+      document.getElementById("resumeBtn").style.display = "none";
     }
 
     function pauseGame() { isPaused = true; }
@@ -698,7 +701,7 @@
           list.appendChild(li);
 
           if (user === currentUser) {
-            serialInfo.innerHTML = `👤 <strong>${index + 1}. ${user}</strong> ❤️`;
+            serialInfo.innerHTML = `👤 <strong>${index + 1}. ${user} (You)</strong> ❤️`;
           }
         });
 
@@ -754,6 +757,14 @@
     // ✅ Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
+
+    function togglePause() {
+      isPaused = !isPaused;
+
+      document.getElementById("pauseBtn").style.display = isPaused ? "none" : "inline-block";
+      document.getElementById("resumeBtn").style.display = isPaused ? "inline-block" : "none";
+    }
+
 
   </script>
 
