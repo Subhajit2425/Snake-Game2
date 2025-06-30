@@ -13,6 +13,8 @@
       height: 100%;
       width: 100%;
       touch-action: none;
+      max-height: 100vh;
+      max-width: 100vw;
     }
 
     body {
@@ -51,14 +53,14 @@
     }
 
     #mobileControls {
-      display: none; /* Shown only on mobile via JS */
+      display: none;
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      margin-top: 16px;
-      padding-bottom: env(safe-area-inset-bottom);
-      position: relative;
-      z-index: 10;
+      padding: 8px 0 env(safe-area-inset-bottom);
+      width: 100%;
+      box-sizing: border-box;
+      background: transparent;
     }
 
 
@@ -206,6 +208,17 @@
       transform-origin: top center;
     }
 
+    #gameOuterWrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: var(--app-height);
+      width: 100vw;
+      overflow: hidden;
+    }
+
+
     #gameScaleBox {
       width: 360px;
       height: 540px;
@@ -215,6 +228,20 @@
       flex-direction: column;
       justify-content: flex-start;
     }
+
+    @media (max-width: 768px) {
+      #controls button {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+
+      .mobileButtons {
+        width: 60px;
+        height: 60px;
+        font-size: 1.6rem;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -233,26 +260,28 @@
 
   <!-- ✅ Game Screen -->
   <div id="game" class="hidden">
-    <div id="gameWrapper">
-      <div id="gameScaleBox"> <!-- ✅ Add wrapper -->
-        <canvas id="gameCanvas"></canvas>
-        <div id="controls">
-          <button onclick="pauseGame()">Pause</button>
-          <button onclick="resumeGame()">Resume</button>
-          <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+    <div id="gameOuterWrapper">
+      <div id="gameWrapper">
+        <div id="gameScaleBox">
+          <canvas id="gameCanvas"></canvas>
+          <div id="controls">
+            <button onclick="pauseGame()">Pause</button>
+            <button onclick="resumeGame()">Resume</button>
+            <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <!-- ✅ Mobile Controls -->
-    <div id="mobileControls">
-      <div class="mobileRow">
-        <button class="mobileButtons" onclick="move('UP')">⬆️</button>
-      </div>
-      <div class="mobileRow">
-        <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
-        <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
-        <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
+
+      <!-- ✅ Mobile Controls (grouped below game wrapper) -->
+      <div id="mobileControls">
+        <div class="mobileRow">
+          <button class="mobileButtons" onclick="move('UP')">⬆️</button>
+        </div>
+        <div class="mobileRow">
+          <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
+          <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
+          <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
+        </div>
       </div>
     </div>
   </div>
@@ -475,13 +504,15 @@
       document.getElementById("gameOver").classList.add("hidden");
       gameDiv.classList.remove("hidden");
 
-      // ✅ Show mobile controls only if mobile
-      const mobileControls = document.getElementById('mobileControls');
-      if (isMobileDevice()) {
-        mobileControls.style.display = 'flex';
-      } else {
-        mobileControls.style.display = 'none';
-      }
+      // Defer control rendering
+      setTimeout(() => {
+        const mobileControls = document.getElementById('mobileControls');
+        if (isMobileDevice()) {
+          mobileControls.style.display = 'flex';
+        } else {
+          mobileControls.style.display = 'none';
+        }
+      }, 100);
 
       gameInterval = setInterval(gameLoop, speed);
     }
@@ -577,48 +608,47 @@
     function resizeGame() {
       const wrapper = document.getElementById('gameWrapper');
       const scaleBox = document.getElementById('gameScaleBox');
-      
+      const mobileControls = document.getElementById('mobileControls');
+
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
-      const desiredWidth = 360;
-      const desiredHeight = 540;
+      const gameWidth = 360;
+      const gameHeight = 540;
 
-      // Padding around the scale box (can be adjusted)
-      const paddingX = 40;  // horizontal padding
-      const paddingY = 80;  // vertical padding (also makes room for controls)
+      const availableHeight = isMobileDevice()
+        ? vh - mobileControls.offsetHeight - 40  // Reserve space for mobile buttons
+        : vh - 40;
 
       const scale = Math.min(
-        (vw - paddingX) / desiredWidth,
-        (vh - paddingY) / desiredHeight
+        (vw - 20) / gameWidth,
+        availableHeight / gameHeight
       );
 
       wrapper.style.transform = `scale(${scale})`;
       wrapper.style.transformOrigin = 'top center';
-
-      // Optional: add padding to the scale box for visibility
-      scaleBox.style.padding = '10px'; // can tweak as needed
-
     }
 
-   // ✅ Call resizeGame on page load and when resizing the window
-    window.addEventListener("resize", resizeGame);
-    window.addEventListener("load", resizeGame);
 
-    function setAppHeight() {
+   function setAppHeight() {
       const appHeight = window.innerHeight;
       document.documentElement.style.setProperty('--app-height', `${appHeight}px`);
 
-      // ✅ Fix for iOS/Safari and bottom cut-off
+      // ✅ Fix for iOS/Safari browser UI shrinking the viewport
       const missingSpace = window.innerHeight - document.documentElement.clientHeight;
       document.body.style.paddingBottom = missingSpace > 0 ? `${missingSpace}px` : '0px';
     }
 
-    window.addEventListener('load', setAppHeight);
-    window.addEventListener('resize', setAppHeight);
+    // ✅ Run once on load and update on resize
+    window.addEventListener('load', () => {
+      setAppHeight();
+      resizeGame(); // optional, if you want it called on load
+    });
 
-
-    window.addEventListener('resize', setAppHeight);
+    window.addEventListener('resize', () => {
+      setAppHeight();
+      resizeGame(); // optional, if canvas should adjust on resize
+    });
 
 
     // Detect if it's a touch device (mobile/tablet)
