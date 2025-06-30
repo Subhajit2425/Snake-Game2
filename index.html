@@ -73,17 +73,21 @@
     }
 
     .modal-content {
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #1b1b1b, #333);
-      padding: 20px 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 15px #00ffe1;
-      text-align: center;
-      color: white;
-      max-width: 600px;
-      animation: fadeIn 0.5s ease-in-out;
+        display: flex; /* ✅ Enable flexbox */
+        flex-direction: column; /* ✅ Stack items vertically */
+        align-items: center; /* ✅ Center elements horizontally */
+        justify-content: center; /* ✅ Optional: center vertically inside modal-content box */
+        
+        background: linear-gradient(135deg, #1b1b1b, #333);
+        padding: 20px 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px #00ffe1;
+        text-align: center;
+        color: white;
+        max-width: 600px;
+        animation: fadeIn 0.5s ease-in-out;
     }
+
 
     .modal-content a {
       color: #00ffe1;
@@ -208,10 +212,17 @@
       flex-direction: column;
       justify-content: flex-start;
     }
+
+    #userList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-family: monospace;
+    }
+
   </style>
 </head>
 <body>
-  
 
   <!-- ✅ Main Menu -->
   <div id="menu" class="overlay">
@@ -219,6 +230,8 @@
     <h1 id="SnakeM">SNAKE GAME</h1>
     <div class="menuButtons">
       <button onclick="selectDifficulty()">Start Game</button>
+      <button onclick="showUsers()">Community</button>
+      <button onclick="resetUser()">Reset User</button>
       <button onclick="showInstruction()">Instructions</button>
       <button onclick="showAbout()">About</button> <!-- 👈 New button -->
     </div>
@@ -613,6 +626,59 @@
       }
     });
 
+    
+    // ✅ Show login only ONCE per user (first time only)
+    window.addEventListener("load", () => {
+        const name = localStorage.getItem("playerName");
+        const menu = document.getElementById("menu");
+        const loginModal = document.getElementById("loginModal");
+
+        if (!name) {
+            loginModal.style.display = "flex"; // Show login only if no name exists
+            menu.style.display = "none";
+        } else {
+            loginModal.style.display = "none";
+            menu.style.display = "flex";
+        }
+    });
+
+    function submitName() {
+        const input = document.getElementById("playerNameInput");
+        const name = input.value.trim();
+
+        if (name) {
+            localStorage.setItem("playerName", name); // Save name
+
+            let users = JSON.parse(localStorage.getItem("allUsers") || "[]");
+
+            if (!users.includes(name)) {
+            users.push(name);
+            localStorage.setItem("allUsers", JSON.stringify(users));
+            }
+
+            document.getElementById("loginModal").style.display = "none";
+            document.getElementById("menu").style.display = "flex";
+        } else {
+            alert("Please enter your name.");
+        }
+    }
+
+
+    function showUsers() {
+        const users = JSON.parse(localStorage.getItem("allUsers") || "[]");
+        const list = document.getElementById("userList");
+        list.innerHTML = users.map((user, index) => `<li>${index + 1}. ${user}</li>`).join("");
+        document.getElementById("usersModal").style.display = "flex";
+    }
+
+    function closeUsers() {
+        document.getElementById("usersModal").style.display = "none";
+    }
+
+    function resetUser() {
+        localStorage.removeItem("playerName");
+        location.reload(); // refresh page to show login again
+    }
 
   </script>
 
@@ -627,7 +693,7 @@
 
   <div id="instructionModal" class="modal">
     <div class="modal-content">
-      <h2 class="About">Instructions</h2>
+      <h2 class="About"> Instructions </h2>
       <p>
         🐍 1. The snake (🟢) starts at the center.<br>
         ⬆️ 2. Use the arrow keys to move the snake.<br>
@@ -643,7 +709,7 @@
 
   <div id="aboutModal" class="modal">
     <div class="modal-content">
-      <h2 class="About">About This Game</h2>
+      <h2 class="About"> About This Game </h2>
       <p>
         🎮 Welcome to the Classic Snake Game — Remade with a Modern Touch!<br>
         🚀 The snake (🟢) starts at the center of the arena.<br>
@@ -653,6 +719,24 @@
         <code><strong>Made in India 🇮🇳</strong></code>
       </p>
       <button onclick="closeAbout()">Close</button>
+    </div>
+  </div>
+
+  <div id="loginModal" class="modal" style="display: flex;">
+    <div class="modal-content">
+        <h2 class="About"> Welcome To SNAKE GAME </h2>
+        <h2>Enter your name to get started:</h2>
+        <input type="text" id="playerNameInput" placeholder="Your name" style="padding: 10px; font-size: 1rem; border-radius: 5px; border: none;" />
+        <br><br>
+        <button onclick="submitName()">Submit</button>
+    </div>
+  </div>
+
+  <div id="usersModal" class="modal">
+    <div class="modal-content">
+        <h2 class="About"> Our Community </h2>
+        <ul id="userList" style="list-style: none; padding: 0;"></ul>
+        <button onclick="closeUsers()">Close</button>
     </div>
   </div>
 
