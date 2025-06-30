@@ -211,6 +211,19 @@
       flex-direction: column;
       justify-content: flex-start;
     }
+
+    #scaler {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: black;
+      transform: scale(calc(min(100vw / 360, 100vh / 540)));
+      transform-origin: top center;
+    }
+
   </style>
 </head>
 <body>
@@ -229,24 +242,26 @@
 
   <!-- ✅ Game Screen -->
   <div id="game" class="hidden">
-    <div id="gameWrapper">
-      <div id="gameScaleBox"> <!-- ✅ Add wrapper -->
-        <canvas id="gameCanvas"></canvas>
-        <div id="controls">
-          <button onclick="pauseGame()">Pause</button>
-          <button onclick="resumeGame()">Resume</button>
-          <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
-        </div>
-    
-        <!-- ✅ Mobile Controls -->
-        <div id="mobileControls">
-          <div class="mobileRow">
-            <button class="mobileButtons" onclick="move('UP')">⬆️</button>
+    <div id="scaler">
+      <div id="gameWrapper">
+        <div id="gameScaleBox"> <!-- ✅ Add wrapper -->
+          <canvas id="gameCanvas"></canvas>
+          <div id="controls">
+            <button onclick="pauseGame()">Pause</button>
+            <button onclick="resumeGame()">Resume</button>
+            <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
           </div>
-          <div class="mobileRow">
-            <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
-            <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
-            <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
+      
+          <!-- ✅ Mobile Controls -->
+          <div id="mobileControls">
+            <div class="mobileRow">
+              <button class="mobileButtons" onclick="move('UP')">⬆️</button>
+            </div>
+            <div class="mobileRow">
+              <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
+              <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
+              <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
+            </div>
           </div>
         </div>
       </div>
@@ -560,37 +575,6 @@
     // ✅ Load high score
     highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
 
-
-    function resizeGame() {
-      const wrapper = document.getElementById('gameWrapper');
-      const scaleBox = document.getElementById('gameScaleBox');
-      
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
-      const desiredWidth = 360;
-      const desiredHeight = 540;
-
-      // Padding around the scale box (can be adjusted)
-      const paddingX = 40;  // horizontal padding
-      const paddingY = 80;  // vertical padding (also makes room for controls)
-
-      const scale = Math.min(
-        (vw - paddingX) / desiredWidth,
-        (vh - paddingY) / desiredHeight
-      );
-
-      wrapper.style.transform = `scale(${scale})`;
-      wrapper.style.transformOrigin = 'top center';
-
-      // Optional: add padding to the scale box for visibility
-      scaleBox.style.padding = '10px'; // can tweak as needed
-
-    }
-
-   // ✅ Call resizeGame on page load and when resizing the window
-    window.addEventListener("resize", resizeGame);
-    window.addEventListener("load", resizeGame);
 
     // Detect if it's a touch device (mobile/tablet)
     function isMobileDevice() {
