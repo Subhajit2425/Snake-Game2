@@ -249,7 +249,7 @@
         <div id="controls">
           <button id="pauseBtn" onclick="togglePause()">Pause</button>
           <button id="resumeBtn" onclick="togglePause()" style="display: none;">Resume</button>
-          <button class="exitBtn" onclick="if (!isPaused) togglePause(); showMenu()">Exit</button>
+          <button class="exitBtn" onclick="confirmExit()">Exit</button>
         </div>
     
         <!-- ✅ Mobile Controls -->
@@ -280,9 +280,10 @@
   </div>
 
   <!-- 🔊 Sound Effects -->
-  <audio id="eatSound" src="https://www.soundjay.com/human/bone-crack-1.mp3"></audio>
-  <audio id="gameOverSound" src="https://www.soundjay.com/buttons/button-4.mp3"></audio>
   <audio id="startSound" src="https://www.soundjay.com/buttons/button-11.mp3"></audio>
+  <audio id="eatSound" src="https://www.soundjay.com/human/bone-crack-1.mp3"></audio>
+  <audio id="CongratulationsSound" src="https://www.soundjay.com/buttons/button-14.wav"></audio>
+  <audio id="gameOverSound" src="https://www.soundjay.com/buttons/button-4.mp3"></audio>
 
   <script>
     const gameDiv = document.getElementById('game');
@@ -302,9 +303,11 @@
 
     let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false, obstacleCount = 20;
 
-    const eatSound = document.getElementById('eatSound');
-    const gameOverSound = document.getElementById('gameOverSound');
+
     const startSound = document.getElementById('startSound');
+    const eatSound = document.getElementById('eatSound');
+    const CongratulationsSound = document.getElementById('CongratulationsSound');
+    const gameOverSound = document.getElementById('gameOverSound');
 
 
     function isOccupied(x, y, snakeHead, tail, fruits,  obstacles) {
@@ -374,6 +377,16 @@
       document.getElementById("gameOver").classList.add("hidden");
       clearInterval(gameInterval);
       gameRunning = false;
+    }
+
+    function confirmExit() {
+      if (!isPaused) pauseGame();
+      const confirmLeave = confirm("Are you sure you want to exit to the main menu?");
+      if (confirmLeave) {
+        showMenu();
+      } else {
+        resumeGame(); // Optional: resume if they cancel
+      }
     }
 
     function draw() {
@@ -458,12 +471,15 @@
     function endGame() {
       clearInterval(gameInterval);
       gameRunning = false;
-      gameOverSound.play();
 
       if (score > highScore) {
+        showCongratulations();
+        CongratulationsSound.play();
         highScore = score;
         localStorage.setItem('snakeHighScore', highScore);
-      }
+      } else {
+        gameOverSound.play();
+      } 
       
       gameDiv.classList.add("hidden");
       document.getElementById("gameOver").classList.remove("hidden");
@@ -519,6 +535,7 @@
       startGame();
     }
 
+
     function showInstruction() {
       document.getElementById("instructionModal").style.display = "flex";
     }
@@ -527,14 +544,25 @@
       document.getElementById("instructionModal").style.display = "none";
     }
 
+
     function showAbout() {
       document.getElementById("aboutModal").style.display = "flex";
     }
 
-
     function closeAbout() {
       document.getElementById("aboutModal").style.display = "none";
     }
+
+
+    function showCongratulations() {
+      document.getElementById("newHighScoreText").textContent = score;
+      document.getElementById("CongratulationsModal").style.display = "flex";
+    }
+
+    function closeCongratulations() {
+      document.getElementById("CongratulationsModal").style.display = "none";
+    }
+
 
     function move(newDir) {
       if (!gameRunning) return; // game not started yet
@@ -841,6 +869,13 @@
     </div>
   </div>
 
+  <div id="CongratulationsModal" class="modal">
+    <div class="modal-content">
+      <h2 class="About"> !! Congratulations !! </h2>
+      <h2> 🏆 New highScore: <span id="newHighScoreText"></span> 🎉 </h2>
+      <button onclick="closeCongratulations()">Close</button>
+    </div>
+  </div>
 
 </body>
 </html>
