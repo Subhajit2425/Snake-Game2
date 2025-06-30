@@ -3,32 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <title>Snake Game 2</title>
+
+  <!-- Responsive Scaling -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+  <!-- iOS Web App -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Snake Game" />
+
+  <!-- Android Status Bar -->
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Disable phone number detection on iOS -->
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <!-- Manifest (optional) -->
+  <!-- <link rel="manifest" href="manifest.json" /> -->
 
   <style>
     html, body {
       margin: 0;
       padding: 0;
+      width: 100vw;
+      height: 100dvh;
       overflow: hidden;
-      height: 100%;
-      width: 100%;
       touch-action: none;
-    }
 
-    body {
+      /* ✅ Safe area support (modern and old iOS) */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+
+      padding-top: constant(safe-area-inset-top);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-left: constant(safe-area-inset-left);
+      padding-right: constant(safe-area-inset-right);
+
+      box-sizing: border-box;
+
       background-color: black;
       color: white;
-      font-family: monospace;
+      font-family: 'monospace', 'Courier New', Courier, monospace;
       white-space: pre;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
+
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 100vh;
-      
+
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+
 
     canvas {
       border: 2px solid white;
@@ -106,6 +136,7 @@
       box-shadow: 0 0 10px #00ffe1, 0 0 20px #00ffe1;
       transition: all 0.2s ease-in-out;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     .mobileButtons:active {
@@ -161,6 +192,8 @@
       border-radius: 30px;
       transition: all 0.3s ease;
       box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     button:hover {
@@ -189,16 +222,16 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      height: 100dvh;
       width: 100vw;
-      overflow: hidden;
+      height: 100vh;
       box-sizing: border-box;
-      transform: scale(
-        min(
-          calc((100vw - 20px) / 360),
-          calc((100vh - 40px) / 540)
-        )
-      );
+      overflow: hidden;
+
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+
       transform-origin: top center;
     }
 
@@ -211,19 +244,6 @@
       flex-direction: column;
       justify-content: flex-start;
     }
-
-    #scaler {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      background: black;
-      transform: scale(calc(min(100vw / 360, 100vh / 540)));
-      transform-origin: top center;
-    }
-
   </style>
 </head>
 <body>
@@ -242,26 +262,24 @@
 
   <!-- ✅ Game Screen -->
   <div id="game" class="hidden">
-    <div id="scaler">
-      <div id="gameWrapper">
-        <div id="gameScaleBox"> <!-- ✅ Add wrapper -->
-          <canvas id="gameCanvas"></canvas>
-          <div id="controls">
-            <button onclick="pauseGame()">Pause</button>
-            <button onclick="resumeGame()">Resume</button>
-            <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+    <div id="gameWrapper">
+      <div id="gameScaleBox"> <!-- ✅ Add wrapper -->
+        <canvas id="gameCanvas"></canvas>
+        <div id="controls">
+          <button onclick="pauseGame()">Pause</button>
+          <button onclick="resumeGame()">Resume</button>
+          <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+        </div>
+    
+        <!-- ✅ Mobile Controls -->
+        <div id="mobileControls">
+          <div class="mobileRow">
+            <button class="mobileButtons" onclick="move('UP')">⬆️</button>
           </div>
-      
-          <!-- ✅ Mobile Controls -->
-          <div id="mobileControls">
-            <div class="mobileRow">
-              <button class="mobileButtons" onclick="move('UP')">⬆️</button>
-            </div>
-            <div class="mobileRow">
-              <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
-              <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
-              <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
-            </div>
+          <div class="mobileRow">
+            <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
+            <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
+            <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
           </div>
         </div>
       </div>
@@ -370,6 +388,7 @@
 
     function showMenu() {
       document.getElementById("menu").style.display = "flex"; // 👈 restore buttons
+      document.getElementById("difficultyModal").style.display = "none"; // Add this
       gameDiv.classList.add("hidden");
       document.getElementById("gameOver").classList.add("hidden");
       clearInterval(gameInterval);
@@ -392,7 +411,7 @@
 
 
       // 🐍 Head of the snake
-      ctx.font = `${tileSize + 2}px Arial`;
+      ctx.font = `${tileSize * 1.2}px Arial`;  // instead of tileSize + 2
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("🟢", x * tileSize + tileSize / 2, y * tileSize + tileSize / 2);
@@ -404,7 +423,7 @@
       }
 
 
-      ctx.font = `${tileSize + 1}px Arial`; // Adjust font size as needed
+      ctx.font = `${tileSize * 1}px Arial`;  // instead of tileSize + 2
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
@@ -576,6 +595,37 @@
     highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
 
 
+    function resizeGame() {
+      const wrapper = document.getElementById('gameWrapper');
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const desiredWidth = 360;
+      const desiredHeight = 540;
+
+      const safeTop = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
+      const safeBottom = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+
+      const usableHeight = vh - safeTop - safeBottom - 10;
+
+      const scale = Math.min(
+        (vw - 20) / desiredWidth,
+        usableHeight / desiredHeight
+      );
+
+      wrapper.style.transform = `scale(${scale})`;
+      wrapper.style.transformOrigin = 'top center';
+
+      // Optional centering
+      wrapper.style.marginTop = `${Math.max((vh - desiredHeight * scale) / 2, 0)}px`;
+    }
+
+
+
+   // ✅ Call resizeGame on page load and when resizing the window
+    window.addEventListener("resize", resizeGame);
+    window.addEventListener("load", resizeGame);
+
     // Detect if it's a touch device (mobile/tablet)
     function isMobileDevice() {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
@@ -598,6 +648,16 @@
         mobileControls.style.display = 'none';
       }
     });
+
+    function checkOrientation() {
+      if (window.innerWidth > window.innerHeight) {
+        alert("For the best experience, please rotate your device to portrait mode.");
+      }
+    }
+
+window.addEventListener("orientationchange", checkOrientation);
+window.addEventListener("load", checkOrientation);
+
 
 
   </script>
