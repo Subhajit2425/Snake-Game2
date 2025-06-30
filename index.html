@@ -13,8 +13,6 @@
       height: 100%;
       width: 100%;
       touch-action: none;
-      max-height: 100vh;
-      max-width: 100vw;
     }
 
     body {
@@ -28,8 +26,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: var(--app-height);
-      padding-bottom: env(safe-area-inset-bottom);
+      height: 100vh;
+      
     }
 
     canvas {
@@ -53,16 +51,12 @@
     }
 
     #mobileControls {
+      margin-top: 20px;
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      padding: 8px 0 env(safe-area-inset-bottom);
-      width: 100%;
-      box-sizing: border-box;
-      background: transparent;
+      gap: 10px;
     }
-
 
     .modal {
       display: none;
@@ -195,7 +189,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      height: var(--app-height);
+      height: 100dvh;
       width: 100vw;
       overflow: hidden;
       box-sizing: border-box;
@@ -208,17 +202,6 @@
       transform-origin: top center;
     }
 
-    #gameOuterWrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: var(--app-height);
-      width: 100vw;
-      overflow: hidden;
-    }
-
-
     #gameScaleBox {
       width: 360px;
       height: 540px;
@@ -228,20 +211,6 @@
       flex-direction: column;
       justify-content: flex-start;
     }
-
-    @media (max-width: 768px) {
-      #controls button {
-        padding: 8px 15px;
-        font-size: 0.9rem;
-      }
-
-      .mobileButtons {
-        width: 60px;
-        height: 60px;
-        font-size: 1.6rem;
-      }
-    }
-
   </style>
 </head>
 <body>
@@ -260,27 +229,25 @@
 
   <!-- ✅ Game Screen -->
   <div id="game" class="hidden">
-    <div id="gameOuterWrapper">
-      <div id="gameWrapper">
-        <div id="gameScaleBox">
-          <canvas id="gameCanvas"></canvas>
-          <div id="controls">
-            <button onclick="pauseGame()">Pause</button>
-            <button onclick="resumeGame()">Resume</button>
-            <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+    <div id="gameWrapper">
+      <div id="gameScaleBox"> <!-- ✅ Add wrapper -->
+        <canvas id="gameCanvas"></canvas>
+        <div id="controls">
+          <button onclick="pauseGame()">Pause</button>
+          <button onclick="resumeGame()">Resume</button>
+          <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+        </div>
+    
+        <!-- ✅ Mobile Controls -->
+        <div id="mobileControls">
+          <div class="mobileRow">
+            <button class="mobileButtons" onclick="move('UP')">⬆️</button>
           </div>
-        </div>
-      </div>
-
-      <!-- ✅ Mobile Controls (grouped below game wrapper) -->
-      <div id="mobileControls">
-        <div class="mobileRow">
-          <button class="mobileButtons" onclick="move('UP')">⬆️</button>
-        </div>
-        <div class="mobileRow">
-          <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
-          <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
-          <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
+          <div class="mobileRow">
+            <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
+            <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
+            <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
+          </div>
         </div>
       </div>
     </div>
@@ -503,20 +470,9 @@
       document.getElementById("menu").style.display = "none";
       document.getElementById("gameOver").classList.add("hidden");
       gameDiv.classList.remove("hidden");
-
-      // Defer control rendering
-      setTimeout(() => {
-        const mobileControls = document.getElementById('mobileControls');
-        if (isMobileDevice()) {
-          mobileControls.style.display = 'flex';
-        } else {
-          mobileControls.style.display = 'none';
-        }
-      }, 100);
-
+      
       gameInterval = setInterval(gameLoop, speed);
     }
-
 
     function pauseGame() { isPaused = true; }
     function resumeGame() { if (gameRunning) isPaused = false; }
@@ -608,48 +564,33 @@
     function resizeGame() {
       const wrapper = document.getElementById('gameWrapper');
       const scaleBox = document.getElementById('gameScaleBox');
-      const mobileControls = document.getElementById('mobileControls');
-
+      
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
-      const gameWidth = 360;
-      const gameHeight = 540;
+      const desiredWidth = 360;
+      const desiredHeight = 540;
 
-      const availableHeight = isMobileDevice()
-        ? vh - mobileControls.offsetHeight - 40  // Reserve space for mobile buttons
-        : vh - 40;
+      // Padding around the scale box (can be adjusted)
+      const paddingX = 40;  // horizontal padding
+      const paddingY = 80;  // vertical padding (also makes room for controls)
 
       const scale = Math.min(
-        (vw - 20) / gameWidth,
-        availableHeight / gameHeight
+        (vw - paddingX) / desiredWidth,
+        (vh - paddingY) / desiredHeight
       );
 
       wrapper.style.transform = `scale(${scale})`;
       wrapper.style.transformOrigin = 'top center';
+
+      // Optional: add padding to the scale box for visibility
+      scaleBox.style.padding = '10px'; // can tweak as needed
+
     }
 
-
-   function setAppHeight() {
-      const appHeight = window.innerHeight;
-      document.documentElement.style.setProperty('--app-height', `${appHeight}px`);
-
-      // ✅ Fix for iOS/Safari browser UI shrinking the viewport
-      const missingSpace = window.innerHeight - document.documentElement.clientHeight;
-      document.body.style.paddingBottom = missingSpace > 0 ? `${missingSpace}px` : '0px';
-    }
-
-    // ✅ Run once on load and update on resize
-    window.addEventListener('load', () => {
-      setAppHeight();
-      resizeGame(); // optional, if you want it called on load
-    });
-
-    window.addEventListener('resize', () => {
-      setAppHeight();
-      resizeGame(); // optional, if canvas should adjust on resize
-    });
-
+   // ✅ Call resizeGame on page load and when resizing the window
+    window.addEventListener("resize", resizeGame);
+    window.addEventListener("load", resizeGame);
 
     // Detect if it's a touch device (mobile/tablet)
     function isMobileDevice() {
@@ -662,6 +603,18 @@
 
       return isTouch || isMobileAgent;
     }
+
+
+    // Show mobile controls only on mobile
+    window.addEventListener('DOMContentLoaded', () => {
+      const mobileControls = document.getElementById('mobileControls');
+      if (isMobileDevice()) {
+        mobileControls.style.display = 'flex';
+      } else {
+        mobileControls.style.display = 'none';
+      }
+    });
+
 
   </script>
 
