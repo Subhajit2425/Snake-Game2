@@ -230,6 +230,31 @@
         font-family: monospace;
     }
 
+    .countdown-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+    }
+
+    #countdownText {
+      font-size: 6rem;
+      color: #00ffe1;
+      font-family: monospace;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.6; }
+    }
+
   </style>
 </head>
 <body>
@@ -242,7 +267,7 @@
       <button onclick="selectDifficulty()">Start Game</button>
       <button onclick="showUsers()">Community</button>
       <button onclick="showInstruction()">Instructions</button>
-      <button onclick="resetUser()">Reset User</button>
+      <button onclick="if (confirm('Are You Sure You Want To Edit Your User Name ?')) editUsername()">Edit Name</button>
       <button onclick="showAbout()">About</button> <!-- 👈 New button -->
     </div>
   </div>
@@ -387,11 +412,11 @@
 
     function confirmExit() {
       if (!isPaused) pauseGame();
-      const confirmLeave = confirm("Are you sure you want to exit to the main menu?");
+      const confirmLeave = confirm("Are You Sure You Want To Exit To The Main Menu ?");
       if (confirmLeave) {
         showMenu();
       } else {
-        resumeGame(); // Optional: resume if they cancel
+        startCountdownThenResume(); // Optional: resume if they cancel
       }
     }
 
@@ -524,6 +549,10 @@
     function selectDifficulty() {
       // Show the difficulty selection modal
       document.getElementById("difficultyModal").style.display = "flex";
+    }
+
+    function closeDifficulty() {
+      document.getElementById("difficultyModal").style.display = "none";
     }
 
     function setDifficulty(choice) {
@@ -702,9 +731,12 @@
           document.getElementById("menu").style.display = "flex";
         } else {
           // If name is new, save to Firebase
-          firebase.database().ref("users").push({
+          firebase.database().ref('users').push({
             name: name,
             timestamp: Date.now()
+          }).then(snapshot => {
+            // ✅ Save the unique Firebase key locally for future editing
+            localStorage.setItem("userKey", snapshot.key);
           });
 
           localStorage.setItem("playerName", name);
@@ -744,36 +776,8 @@
     }
 
 
-
     function closeUsers() {
         document.getElementById("usersModal").style.display = "none";
-    }
-
-    function resetUser() {
-      const currentUser = localStorage.getItem("playerName");
-
-      if (!currentUser) {
-        alert("No user is currently logged in.");
-        return;
-      }
-
-      // Confirm before resetting
-      if (!confirm("Are you sure you want to reset your user and remove your name from the community?")) {
-        return;
-      }
-
-      // Remove user from Firebase
-      firebase.database().ref("users").once("value", snapshot => {
-        snapshot.forEach(child => {
-          if (child.val().name === currentUser) {
-            firebase.database().ref("users").child(child.key).remove();
-          }
-        });
-
-        // Remove from localStorage and reload
-        localStorage.removeItem("playerName");
-        location.reload();
-      });
     }
 
 
@@ -792,12 +796,94 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    function togglePause() {
-      isPaused = !isPaused;
+    // ✅ Recover missing userKey for old users
+    window.addEventListener("load", () => {
+      const currentName = localStorage.getItem("playerName");
+      const storedKey = localStorage.getItem("userKey");
 
-      document.getElementById("pauseBtn").style.display = isPaused ? "none" : "inline-block";
-      document.getElementById("resumeBtn").style.display = isPaused ? "inline-block" : "none";
+      if (currentName && !storedKey) {
+        // Try to find the matching Firebase entry
+        firebase.database().ref("users").orderByChild("name").equalTo(currentName).once("value", snapshot => {
+          snapshot.forEach(child => {
+            // Save the matched key
+            localStorage.setItem("userKey", child.key);
+          });
+        });
+      }
+    });
+
+
+    function togglePause() {
+      if (!gameRunning) return;
+
+      if (isPaused) {
+        // 👉 Resume with countdown
+        startCountdownThenResume(); // call countdown first
+      } else {
+        // 👉 Pause immediately
+        isPaused = true;
+        document.getElementById("pauseBtn").style.display = "none";
+        document.getElementById("resumeBtn").style.display = "inline-block";
+      }
     }
+
+
+    function editUsername() {
+      const currentName = localStorage.getItem("playerName");
+      document.getElementById("editNameInput").value = currentName || '';
+      document.getElementById("editUsernameModal").style.display = "flex";
+    }
+
+    function submitEditedUsername() {
+      const newName = document.getElementById("editNameInput").value.trim();
+      const key = localStorage.getItem("userKey");
+
+      if (!key || !newName) {
+        alert("Invalid input or missing user ID.");
+        return;
+      }
+
+      // ✅ Update in Firebase
+      firebase.database().ref(`users/${key}`).update({
+        name: newName
+      });
+
+      // ✅ Update locally
+      localStorage.setItem("playerName", newName);
+      document.getElementById("editUsernameModal").style.display = "none";
+      alert("Your name has been updated!");
+    }
+
+    function closeEditUsername() {
+      document.getElementById("editUsernameModal").style.display = "none";
+    }
+
+    function startCountdownThenResume() {
+      const overlay = document.getElementById("countdownOverlay");
+      const text = document.getElementById("countdownText");
+      overlay.style.display = "flex";
+
+      let count = 3;
+      text.textContent = count;
+
+      const interval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          text.textContent = count;
+        } else if (count === 0) {
+          text.textContent = "Go!";
+        } else {
+          clearInterval(interval);
+          overlay.style.display = "none";
+
+          // ✅ Resume game and toggle buttons back
+          isPaused = false;
+          document.getElementById("pauseBtn").style.display = "inline-block";
+          document.getElementById("resumeBtn").style.display = "none";
+        }
+      }, 1000);
+    }
+
 
 
   </script>
@@ -808,6 +894,7 @@
       <button onclick="setDifficulty('e')">Easy</button>
       <button onclick="setDifficulty('m')">Medium</button>
       <button onclick="setDifficulty('h')">Hard</button>
+      <button class="exitBtn" onclick="closeDifficulty()">X</button>
     </div>
   </div>
 
@@ -881,6 +968,22 @@
       <h2> 🏆 New highScore: <span id="newHighScoreText"></span> 🎉 </h2>
       <button onclick="closeCongratulations()">Close</button>
     </div>
+  </div>
+
+  <div id="editUsernameModal" class="modal">
+    <div class="modal-content">
+      <h2 class="About">Edit User Name</h2>
+      <input type="text" id="editNameInput" placeholder="Enter new name" style="padding:10px; font-size:1rem; border-radius:5px; border:none;" />
+      <p style="font-size: 0.75rem; color: #ccc; margin-top: 10px;">
+        🔒 We respect your privacy. <br> 💖 Join our growing family with your real name.
+      </p>
+      <button onclick="submitEditedUsername()">Save</button>
+      <button onclick="closeEditUsername()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="countdownOverlay" style="display: none;" class="countdown-overlay">
+    <div id="countdownText">3</div>
   </div>
 
 </body>
