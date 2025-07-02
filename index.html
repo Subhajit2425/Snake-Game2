@@ -520,22 +520,16 @@
         highScore = score;
         localStorage.setItem('snakeHighScore', highScore);
 
-        const name = localStorage.getItem("playerName");
-        if (name) {
-          firebase.database().ref('leaderboard').push({
-            name: name,
-            score: highScore,
-            timestamp: Date.now()
-          });
-        }
+        saveHighScore(score); // ✅ Save to leaderboard without duplicates
       } else {
         gameOverSound.play();
-      } 
-      
+      }
+
       gameDiv.classList.add("hidden");
       document.getElementById("gameOver").classList.remove("hidden");
       document.getElementById("gameOverText").textContent = `Score: ${score}\nHigh Score: ${highScore}`;
     }
+
 
     function gameLoop() {
       update();
@@ -932,22 +926,41 @@
       }, 1000);
     }
 
+    function saveHighScore(score) {
+      const name = localStorage.getItem("playerName");
+      const key = localStorage.getItem("userKey");
+
+      if (!key || !name) return;
+
+      // Save or update high score for the unique user
+      firebase.database().ref("highscores/" + key).set({
+        name: name,
+        score: score
+      });
+    }
+
 
     function showLeaderboard() {
       const list = document.getElementById("leaderboardList");
       list.innerHTML = "";
 
-      firebase.database().ref('leaderboard')
-        .orderByChild('score')
-        .limitToLast(10)
-        .once('value', snapshot => {
+      firebase.database().ref("highscores")
+        .once("value", snapshot => {
           const scores = [];
+
           snapshot.forEach(child => {
-            scores.push(child.val());
+            const entry = child.val();
+            scores.push({
+              name: entry.name,
+              score: entry.score
+            });
           });
 
-          // Reverse to get highest first
-          scores.reverse().forEach((entry, index) => {
+          // Sort by score descending
+          scores.sort((a, b) => b.score - a.score);
+
+          // Limit to top 10
+          scores.slice(0, 10).forEach((entry, index) => {
             const li = document.createElement("li");
             li.textContent = `${index + 1}. ${entry.name} - ${entry.score}`;
             list.appendChild(li);
@@ -956,6 +969,7 @@
           document.getElementById("leaderboardModal").style.display = "flex";
         });
     }
+
 
     function closeLeaderboard() {
       document.getElementById("leaderboardModal").style.display = "none";
