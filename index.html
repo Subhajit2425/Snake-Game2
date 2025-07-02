@@ -270,6 +270,7 @@
       <button onclick="selectDifficulty()">Start Game</button>
       <button onclick="showUsers()">Community</button>
       <button onclick="showInstruction()">Instructions</button>
+      <button onclick="showLeaderboard()">Leaderboard</button>
       <button onclick="if (confirm('Are You Sure You Want To Edit Your User Name ?')) editUsername()">Edit Name</button>
       <button onclick="showAbout()">About</button> <!-- 👈 New button -->
     </div>
@@ -516,6 +517,15 @@
         CongratulationsSound.play();
         highScore = score;
         localStorage.setItem('snakeHighScore', highScore);
+
+        const name = localStorage.getItem("playerName");
+        if (name) {
+          firebase.database().ref('leaderboard').push({
+            name: name,
+            score: highScore,
+            timestamp: Date.now()
+          });
+        }
       } else {
         gameOverSound.play();
       } 
@@ -892,7 +902,33 @@
       }, 1000);
     }
 
+    function showLeaderboard() {
+      const list = document.getElementById("leaderboardList");
+      list.innerHTML = "";
 
+      firebase.database().ref('leaderboard')
+        .orderByChild('score')
+        .limitToLast(10)
+        .once('value', snapshot => {
+          const scores = [];
+          snapshot.forEach(child => {
+            scores.push(child.val());
+          });
+
+          // Reverse to get highest first
+          scores.reverse().forEach((entry, index) => {
+            const li = document.createElement("li");
+            li.textContent = `${index + 1}. ${entry.name} - ${entry.score}`;
+            list.appendChild(li);
+          });
+
+          document.getElementById("leaderboardModal").style.display = "flex";
+        });
+    }
+
+    function closeLeaderboard() {
+      document.getElementById("leaderboardModal").style.display = "none";
+    }
 
   </script>
 
@@ -989,6 +1025,16 @@
       <button onclick="closeEditUsername()">Cancel</button>
     </div>
   </div>
+
+  <div id="leaderboardModal" class="modal">
+    <div class="modal-content">
+      <h2> 🏆 Leaderboard 🏆 </h2>
+      <h3> Top Highscorers </h3>
+      <ul id="leaderboardList"></ul>
+      <button onclick="closeLeaderboard()">Close</button>
+    </div>
+  </div>
+  
 
 </body>
 </html>
