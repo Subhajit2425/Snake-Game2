@@ -324,6 +324,8 @@
   <audio id="eatSound" src="https://www.soundjay.com/human/bone-crack-1.mp3"></audio>
   <audio id="CongratulationsSound" src="https://www.soundjay.com/buttons/button-14.wav"></audio>
   <audio id="gameOverSound" src="https://www.soundjay.com/buttons/button-4.mp3"></audio>
+  <audio id="countdownSound" src="https://www.soundjay.com/buttons/button-33a.wav"></audio>
+  <audio id="goSound" src="https://www.soundjay.com/buttons/button-27.wav"></audio>
 
   <script>
     const gameDiv = document.getElementById('game');
@@ -338,16 +340,16 @@
     let cols = Math.floor(canvas.width / tileSize);
     let rows = Math.floor(canvas.height / tileSize);
 
-
+    let isCountingDown = false;
     let x, y, dx, dy, score, nTail, tail, fruit, fruitNo = 5, obstacles, gameOver = false, dir = '', gameNo = 0, isPaused = false;
-
     let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false, obstacleCount = 20;
-
 
     const startSound = document.getElementById('startSound');
     const eatSound = document.getElementById('eatSound');
     const CongratulationsSound = document.getElementById('CongratulationsSound');
     const gameOverSound = document.getElementById('gameOverSound');
+    const countdownSound = document.getElementById('countdownSound');
+    const goSound = document.getElementById('goSound');
 
 
     function isOccupied(x, y, snakeHead, tail, fruits,  obstacles) {
@@ -541,21 +543,23 @@
     }
 
     function startGame() {
-      startSound.play();
       initGame();
       gameNo++;
-      isPaused = false;
+      isPaused = true;          // ✅ Set paused to true initially
       gameRunning = true;
 
       document.getElementById("menu").style.display = "none";
       document.getElementById("gameOver").classList.add("hidden");
       gameDiv.classList.remove("hidden");
-      
-      gameInterval = setInterval(gameLoop, speed);
 
-      document.getElementById("pauseBtn").style.display = "inline-block";
+      // ❌ Don't start game loop here
+      // ✅ Let countdown handle it after 3..2..1..Go!
+      document.getElementById("pauseBtn").style.display = "none";
       document.getElementById("resumeBtn").style.display = "none";
+
+      startCountdownThenResume(); // ✅ Countdown will start the game loop
     }
+
 
     function pauseGame() { isPaused = true; }
     function resumeGame() { if (gameRunning) isPaused = false; }
@@ -576,17 +580,27 @@
     function setDifficulty(choice) {
       if (choice === 'e') {
         speed = 175; difficulty = "Easy"; obstacleCount = 20;
-        canvas.style.borderColor = "#87CEEB"
+        canvas.style.borderColor = "#87CEEB";
       } else if (choice === 'm') {
         speed = 150; difficulty = "Medium"; obstacleCount = 35;
-        canvas.style.borderColor = "#6495ED"
+        canvas.style.borderColor = "#6495ED";
       } else if (choice === 'h') {
         speed = 125; difficulty = "Hard"; obstacleCount = 50;
-        canvas.style.borderColor = "#4682B4"
+        canvas.style.borderColor = "#4682B4";
       }
+
       document.getElementById("difficultyModal").style.display = "none";
-      startGame();
+
+      // ✅ Instead of startGame(), use this:
+      initGame();
+
+      document.getElementById("menu").style.display = "none";
+      document.getElementById("gameOver").classList.add("hidden");
+      gameDiv.classList.remove("hidden");
+
+      startCountdownThenResume(); // ✅ Use the same function here
     }
+
 
 
     function showInstruction() {
@@ -877,30 +891,47 @@
     }
 
     function startCountdownThenResume() {
+      if (window.isCountingDown) return;
+      window.isCountingDown = true;
+
       const overlay = document.getElementById("countdownOverlay");
       const text = document.getElementById("countdownText");
       overlay.style.display = "flex";
 
       let count = 3;
       text.textContent = count;
+      countdownSound.play();
 
       const interval = setInterval(() => {
         count--;
+
         if (count > 0) {
           text.textContent = count;
+          countdownSound.play();
         } else if (count === 0) {
           text.textContent = "Go!";
+          goSound.play();
         } else {
           clearInterval(interval);
           overlay.style.display = "none";
 
-          // ✅ Resume game and toggle buttons back
+          // ✅ Fix: Clear any previous game interval before starting new one
+          clearInterval(gameInterval); 
+
+          // ✅ Start the game loop fresh
+          gameInterval = setInterval(gameLoop, speed);
+
           isPaused = false;
+          gameRunning = true;
+
           document.getElementById("pauseBtn").style.display = "inline-block";
           document.getElementById("resumeBtn").style.display = "none";
+
+          window.isCountingDown = false;
         }
       }, 1000);
     }
+
 
     function showLeaderboard() {
       const list = document.getElementById("leaderboardList");
