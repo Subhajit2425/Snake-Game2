@@ -221,6 +221,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+      position: relative; /* ✅ Required for countdown to center correctly */
     }
 
     #userList {
@@ -231,24 +232,26 @@
     }
 
     .countdown-overlay {
-      position: fixed;
+      display: none; /* ✅ Hide by default */
+      position: absolute;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      justify-content: center;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6); /* Optional: darken background */
       align-items: center;
-      z-index: 99999;
+      justify-content: center;
+      z-index: 10;
+      pointer-events: none;
     }
 
-    #countdownText {
-      font-size: 6rem;
-      color: #00ffe1;
-      font-family: monospace;
-      animation: pulse 1s ease-in-out infinite;
+    .countdown-text {
+      font-size: 5rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 10px #00ffe1;
     }
+
 
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: 1; }
@@ -277,6 +280,11 @@
     <div id="gameWrapper">
       <div id="gameScaleBox"> <!-- ✅ Add wrapper -->
         <canvas id="gameCanvas"></canvas>
+
+        <div id="countdownOverlay" class="countdown-overlay">
+          <div id="countdownText" class="countdown-text"></div>
+        </div>
+
         <div id="controls">
           <button id="pauseBtn" onclick="togglePause()">Pause</button>
           <button id="resumeBtn" onclick="togglePause()" style="display: none;">Resume</button>
@@ -980,10 +988,6 @@
       <button onclick="submitEditedUsername()">Save</button>
       <button onclick="closeEditUsername()">Cancel</button>
     </div>
-  </div>
-
-  <div id="countdownOverlay" style="display: none;" class="countdown-overlay">
-    <div id="countdownText">3</div>
   </div>
 
 </body>
