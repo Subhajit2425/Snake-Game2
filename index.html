@@ -258,6 +258,67 @@
       50% { transform: scale(1.2); opacity: 0.6; }
     }
 
+    /* Leaderboard List */
+    #leaderboardList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Each leaderboard item */
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 6px 0;
+      font-size: 16px;
+      font-family: monospace;
+    }
+
+    /* Serial number */
+    .leaderboard-serial {
+      width: 30px;
+      text-align: right;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    /* Name and score */
+    .leaderboard-name-score span {
+      color: gold;
+      font-weight: bold;
+    }
+
+    /* Community List */
+    #userList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Each community item */
+    .community-item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 6px 0;
+      font-size: 16px;
+      font-family: monospace;
+    }
+
+    /* Serial number */
+    .community-serial {
+      width: 30px;
+      text-align: right;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    /* Name */
+    .community-name {
+      flex-grow: 1;
+    }
+
   </style>
 </head>
 <body>
@@ -742,40 +803,39 @@
     function submitName() {
       const input = document.getElementById("playerNameInput");
       const name = input.value.trim();
+      const existingKey = localStorage.getItem("userKey");
 
       if (!name) {
         alert("Please enter your name.");
         return;
       }
 
-      // Check if name already exists in Firebase
-      firebase.database().ref("users").orderByChild("name").equalTo(name).once("value", snapshot => {
-        if (snapshot.exists()) {
-          // If name already exists, just save locally and proceed
-          localStorage.setItem("playerName", name);
-          document.getElementById("loginModal").style.display = "none";
-          document.getElementById("menu").style.display = "flex";
-        } else {
-          // If name is new, save to Firebase
-          firebase.database().ref('users').push({
-            name: name,
-            timestamp: Date.now()
-          }).then(snapshot => {
-            // ✅ Save the unique Firebase key locally for future editing
-            localStorage.setItem("userKey", snapshot.key);
-          });
+      // ✅ If already registered, don't push again
+      if (existingKey) {
+        localStorage.setItem("playerName", name);
+        document.getElementById("loginModal").style.display = "none";
+        document.getElementById("menu").style.display = "flex";
+        return;
+      }
 
-          localStorage.setItem("playerName", name);
-          document.getElementById("loginModal").style.display = "none";
-          document.getElementById("menu").style.display = "flex";
-        }
+      // 👉 Push new user only if not already registered on this device
+      const newRef = firebase.database().ref("users").push({
+        name: name,
+        timestamp: Date.now()
       });
+
+      // ✅ Save key and name locally
+      localStorage.setItem("userKey", newRef.key);
+      localStorage.setItem("playerName", name);
+
+      document.getElementById("loginModal").style.display = "none";
+      document.getElementById("menu").style.display = "flex";
     }
 
 
     function showUsers() {
-      const list = document.querySelector("#usersModal #userList"); // target correct list
-      const serialInfo = document.querySelector("#usersModal #serialInfo"); // add this div in usersModal
+      const list = document.querySelector("#usersModal #userList");
+      const serialInfo = document.querySelector("#usersModal #serialInfo");
       list.innerHTML = "";
       serialInfo.innerHTML = "";
 
@@ -789,17 +849,31 @@
 
         users.forEach((user, index) => {
           const li = document.createElement("li");
-          li.textContent = `${index + 1}. ${user}`;
-          list.appendChild(li);
+          li.classList.add("community-item");
+
+          const serial = document.createElement("span");
+          serial.textContent = `${index + 1}.`;
+          serial.classList.add("community-serial");
+
+          const name = document.createElement("span");
+          name.textContent = user;
+          name.classList.add("community-name");
 
           if (user === currentUser) {
-            serialInfo.innerHTML = `👤 <strong>${index + 1}. ${user} (You)</strong> ❤️`;
+            name.style.color = "red";
+            name.style.fontWeight = "bold";
+            serialInfo.innerHTML = `👤 <strong>${index + 1}. ${user} (You) ❤️ </strong>`;
           }
+
+          li.appendChild(serial);
+          li.appendChild(name);
+          list.appendChild(li);
         });
 
         document.getElementById("usersModal").style.display = "flex";
       });
     }
+
 
 
     function closeUsers() {
@@ -956,19 +1030,31 @@
             });
           });
 
-          // Sort by score descending
+          // Sort scores descending
           scores.sort((a, b) => b.score - a.score);
 
-          // Limit to top 10
+          // Top 10
           scores.slice(0, 10).forEach((entry, index) => {
             const li = document.createElement("li");
-            li.textContent = `${index + 1}. ${entry.name} - ${entry.score}`;
+            li.classList.add("leaderboard-item");
+
+            const serial = document.createElement("span");
+            serial.textContent = `${index + 1}.`;
+            serial.classList.add("leaderboard-serial");
+
+            const nameScore = document.createElement("span");
+            nameScore.innerHTML = `${entry.name} – <span>${entry.score}</span>`;
+            nameScore.classList.add("leaderboard-name-score");
+
+            li.appendChild(serial);
+            li.appendChild(nameScore);
             list.appendChild(li);
           });
 
           document.getElementById("leaderboardModal").style.display = "flex";
         });
     }
+
 
 
     function closeLeaderboard() {
@@ -1073,9 +1159,9 @@
 
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
-      <h2> 🏆 Leaderboard 🏆 </h2>
-      <h3> Top Highscorers </h3>
-      <ul id="leaderboardList"></ul>
+      <h2 class="About"> Leaderboard </h2>
+      <h2> 🏆 Top Highscorers 🏆 </h2>
+      <ul id="leaderboardList" style="list-style: none; padding: 0; text-align: center;"></ul>
       <button onclick="closeLeaderboard()">Close</button>
     </div>
   </div>
