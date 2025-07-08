@@ -536,40 +536,49 @@
     }
 
     function update() {
-      if (gameOver || isPaused) return;
+        if (gameOver || isPaused) return;
 
-      tail.unshift({ x, y });
-      if (tail.length > nTail) tail.pop();
+        // Save current head position before moving
+        const prevX = x;
+        const prevY = y;
 
-      switch (dir) {
-        case 'LEFT': x--; break;
-        case 'RIGHT': x++; break;
-        case 'UP': y--; break;
-        case 'DOWN': y++; break;
-      }
-
-      if (
-        x < 0 || x >= cols || y < 0 || y >= rows ||
-        tail.some(t => t.x === x && t.y === y) ||
-        obstacles.some(o => o.x === x && o.y === y)
-      ) {
-        gameOver = true;
-      }
-
-      for (let i = 0; i < fruit.length; i++) {
-        if (fruit[i].x === x && fruit[i].y === y) {
-          score += 10;
-          nTail++;
-          
-          const eatClone = eatSound.cloneNode();
-          eatClone.play();
-
-          fruit[i] = getValidPosition({x, y}, tail, fruit, obstacles, cols, rows);
+        // Move head first
+        switch (dir) {
+            case 'LEFT': x--; break;
+            case 'RIGHT': x++; break;
+            case 'UP': y--; break;
+            case 'DOWN': y++; break;
         }
-      }
 
-      if (gameOver) endGame();
+        // Check collisions with wall, self, or obstacles
+        if (
+            x < 0 || x >= cols || y < 0 || y >= rows ||
+            tail.some(t => t.x === x && t.y === y) ||
+            obstacles.some(o => o.x === x && o.y === y)
+        ) {
+            gameOver = true;
+            endGame();
+            return;
+        }
+
+        // Update tail after head has moved
+        tail.unshift({ x: prevX, y: prevY });
+        if (tail.length > nTail) tail.pop();
+
+        // Check for fruit collision
+        for (let i = 0; i < fruit.length; i++) {
+            if (fruit[i].x === x && fruit[i].y === y) {
+            score += 10;
+            nTail++;
+
+            const eatClone = eatSound.cloneNode();
+            eatClone.play();
+
+            fruit[i] = getValidPosition({x, y}, tail, fruit, obstacles, cols, rows);
+            }
+        }
     }
+
 
     function endGame() {
       clearInterval(gameInterval);
