@@ -486,6 +486,12 @@ const gameDiv = document.getElementById('game');
 
 
     function showUsers() {
+      // ✅ Check for internet connection first
+      if (!navigator.onLine) {
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\n Please Check Your Connection And Try Again Later.");
+        return;
+      }
+
       const list = document.querySelector("#usersModal #userList");
       const serialInfo = document.querySelector("#usersModal #serialInfo");
       list.innerHTML = "";
@@ -670,6 +676,12 @@ const gameDiv = document.getElementById('game');
 
 
     function showLeaderboard() {
+      // ✅ Check for internet connection first
+      if (!navigator.onLine) {
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\n Please Check Your Connection And Try Again.");
+        return;
+      }
+
       const list = document.getElementById("leaderboardList");
       list.innerHTML = "";
 
@@ -711,7 +723,7 @@ const gameDiv = document.getElementById('game');
     }
 
 
-
     function closeLeaderboard() {
       document.getElementById("leaderboardModal").style.display = "none";
     }
+    
