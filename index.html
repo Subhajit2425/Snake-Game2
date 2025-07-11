@@ -381,12 +381,12 @@
   </div>
 
   <!-- 🔊 Sound Effects -->
-  <audio id="startSound" src="https://www.soundjay.com/buttons/button-11.mp3"></audio>
-  <audio id="eatSound" src="https://www.soundjay.com/human/bone-crack-1.mp3"></audio>
-  <audio id="CongratulationsSound" src="https://www.soundjay.com/buttons/button-14.wav"></audio>
-  <audio id="gameOverSound" src="https://www.soundjay.com/buttons/button-4.mp3"></audio>
-  <audio id="countdownSound" src="https://www.soundjay.com/buttons/button-33a.wav"></audio>
-  <audio id="goSound" src="https://www.soundjay.com/buttons/button-27.wav"></audio>
+  <audio id="startSound" src="assets/startSound.mp3"></audio>
+  <audio id="eatSound" src="assets/eatSound.mp3"></audio>
+  <audio id="CongratulationsSound" src="assets/CongratulationsSound.mp3"></audio>
+  <audio id="gameOverSound" src="assets/gameOverSound.mp3"></audio>
+  <audio id="countdownSound" src="assets/countdownSound.mp3"></audio>
+  <audio id="goSound" src="assets/goSound.mp3"></audio>
 
   <script>
     const gameDiv = document.getElementById('game');
@@ -794,20 +794,54 @@
     });
 
     
-    // ✅ Show login only ONCE per user (first time only)
     window.addEventListener("load", () => {
-        const name = localStorage.getItem("playerName");
-        const menu = document.getElementById("menu");
-        const loginModal = document.getElementById("loginModal");
+      const userKey = localStorage.getItem("userKey");
+      const playerName = localStorage.getItem("playerName");
 
-        if (!name) {
-            loginModal.style.display = "flex"; // Show login only if no name exists
-            menu.style.display = "none";
-        } else {
-            loginModal.style.display = "none";
+      const loading = document.getElementById("loadingOverlay");
+      const login = document.getElementById("loginModal");
+      const menu = document.getElementById("menu");
+
+      loading.style.display = "flex"; // Show loading first
+      login.style.display = "none";
+      menu.style.display = "none";
+
+      if (userKey) {
+        firebase.database().ref("users/" + userKey).once("value").then(snapshot => {
+          const userData = snapshot.val();
+          if (userData) {
+            // ✅ Valid returning user
+            localStorage.setItem("playerName", userData.name);
+            loading.style.display = "none";
             menu.style.display = "flex";
-        }
+          } else {
+            // ❌ Invalid user key
+            localStorage.removeItem("userKey");
+            loading.style.display = "none";
+            login.style.display = "flex";
+          }
+        });
+      } else if (playerName) {
+        // Might be an old user (no key, only name)
+        firebase.database().ref("users").orderByChild("name").equalTo(playerName).once("value", snapshot => {
+          if (snapshot.exists()) {
+            snapshot.forEach(child => {
+              localStorage.setItem("userKey", child.key);
+            });
+            loading.style.display = "none";
+            menu.style.display = "flex";
+          } else {
+            loading.style.display = "none";
+            login.style.display = "flex";
+          }
+        });
+      } else {
+        // First time user
+        loading.style.display = "none";
+        login.style.display = "flex";
+      }
     });
+
 
     function submitName() {
       const input = document.getElementById("playerNameInput");
@@ -1125,7 +1159,13 @@
     </div>
   </div>
 
-  <div id="loginModal" class="modal" style="display: flex;">
+   <!-- ✅ Loading overlay -->
+  <div id="loadingOverlay" style="display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; color: white; font-size: 20px; z-index: 9999;">
+       Please Wait <br> Checking Your Account...  
+  </div>
+
+  <!-- ✅ Login Modal -->
+  <div id="loginModal" class="modal" style="display: none;">
     <div class="modal-content">
         <h2 class="About"> Welcome </h2>
         <h2>Enter Your Name To Get Started:</h2>
@@ -1136,6 +1176,7 @@
         <button onclick="submitName()">Submit</button>
     </div>
   </div>
+
 
   <div id="usersModal" class="modal">
     <div class="modal-content">
