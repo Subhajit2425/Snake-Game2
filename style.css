@@ -1,0 +1,307 @@
+html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      touch-action: none;
+    }
+
+    body {
+      background-color: black;
+      color: white;
+      font-family: monospace;
+      white-space: pre;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      box-sizing: border-box;
+    }
+
+    canvas {
+      border: 2px solid white;
+      background-color: black;
+      display: block;
+      margin: 0;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+    }
+
+    #mobileControls {
+      margin-top: 20px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      display: flex; /* ✅ Enable flexbox */
+      flex-direction: column; /* ✅ Stack items vertically */
+      align-items: center; /* ✅ Center elements horizontally */
+      justify-content: center; /* ✅ Optional: center vertically inside modal-content box */
+        
+      background: linear-gradient(135deg, #1b1b1b, #333);
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgb(0, 255, 225);
+      text-align: center;
+      color: white;
+      max-width: 600px;
+      animation: fadeIn 0.5s ease-in-out;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-content a {
+      color: #00ffe1;
+      text-decoration: underline;
+    }
+
+    .modal-content button {
+      margin-top: 20px;
+    }
+
+    .mobileButtons {
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      color: white;
+      box-shadow: none;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+
+    .mobileButtons:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 5px #00ffe1, 0 0 10px #00ffe1;
+    }
+
+    .mobileRow {
+      display: flex;
+      gap: 15px;
+    }
+
+    .menuButtons, .overButtons {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    #SnakeM, #OverHeader, .About {
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #00ffea, #5b42f3, #ff3c83);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: pulseText 3s infinite;
+      margin-bottom: 20px;
+    }
+
+    .hidden { display: none; }
+
+    #menu, #game, #gameOver {
+      text-align: center;
+    }
+
+    button {
+      font-size: 1rem;
+      padding: 10px 25px;
+      background: linear-gradient(135deg, #1f1f1f, #333);
+      color: #fff;
+      border: 2px solid #8562b3;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, rgb(172, 15, 91), #4516b4);
+      transform: scale(1.05);
+      border-color: rgb(0, 240, 240);
+    }
+
+    .exitBtn {
+      background: linear-gradient(135deg, #C42B1C, #5a0e09);
+      border: 2px solid #8562b3;
+    }
+
+    @keyframes pulseText {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #gameWrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      box-sizing: border-box;
+      transform: scale(
+        min(
+          calc((100vw - 20px) / 360),
+          calc((100vh - 40px) / 540)
+        )
+      );
+      transform-origin: top center;
+    }
+
+    #gameScaleBox {
+      width: 360px;
+      height: 540px;
+      padding: 8px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      position: relative; /* ✅ Required for countdown to center correctly */
+    }
+
+    #userList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-family: monospace;
+    }
+
+    .countdown-overlay {
+      display: none; /* ✅ Hide by default */
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6); /* Optional: darken background */
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .countdown-text {
+      font-size: 5rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 10px #00ffe1;
+    }
+
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.6; }
+    }
+
+    /* Leaderboard List */
+    #leaderboardList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Each leaderboard item */
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 6px 0;
+      font-size: 16px;
+      font-family: monospace;
+    }
+
+    /* Serial number */
+    .leaderboard-serial {
+      width: 30px;
+      text-align: right;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    /* Name and score */
+    .leaderboard-name-score span {
+      color: gold;
+      font-weight: bold;
+    }
+
+    /* Community List */
+    #userList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Each community item */
+    .community-item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 6px 0;
+      font-size: 16px;
+      font-family: monospace;
+    }
+
+    /* Serial number */
+    .community-serial {
+      width: 30px;
+      text-align: right;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    /* Name */
+    .community-name {
+      flex-grow: 1;
+    }
