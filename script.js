@@ -101,8 +101,21 @@ const gameDiv = document.getElementById('game');
       }
     }
 
+    function drawCheckerboardBackground() {
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          // Alternate between black and dark gray
+          ctx.fillStyle = (row + col) % 2 === 0 ? "#000000" : "#111111";
+          ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+        }
+      }
+    }
+
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawCheckerboardBackground(); // 👈 Add this line first
 
       ctx.save();
       ctx.font = "20px monospace";
