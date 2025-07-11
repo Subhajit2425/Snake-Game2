@@ -488,7 +488,7 @@ const gameDiv = document.getElementById('game');
     function showUsers() {
       // ✅ Check for internet connection first
       if (!navigator.onLine) {
-        alert("⚠️ Internet Connection Is Slow or Unavailable.\n Please Check Your Connection And Try Again Later.");
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\n Please Check Your Connection And Try Again.");
         return;
       }
 
@@ -726,4 +726,3 @@ const gameDiv = document.getElementById('game');
     function closeLeaderboard() {
       document.getElementById("leaderboardModal").style.display = "none";
     }
-    
