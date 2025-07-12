@@ -747,3 +747,80 @@ const gameDiv = document.getElementById('game');
     function closeLeaderboard() {
       document.getElementById("leaderboardModal").style.display = "none";
     }
+
+    let selectedRating = 0;
+
+    document.querySelectorAll(".star").forEach(star => {
+      star.addEventListener("click", function () {
+        selectedRating = parseInt(this.dataset.value);
+
+        // Highlight selected stars
+        document.querySelectorAll(".star").forEach(s => {
+          s.classList.remove("selected");
+          if (parseInt(s.dataset.value) <= selectedRating) {
+            s.classList.add("selected");
+          }
+        });
+      });
+    });
+
+    function submitFeedback() {
+      if (selectedRating === 0) {
+        alert("Please select a rating.");
+        return;
+      }
+
+      const userKey = localStorage.getItem("userKey");
+      if (!userKey) {
+        alert("User not identified. Please log in again.");
+        return;
+      }
+
+      const feedbackRef = firebase.database().ref("feedbacks/" + userKey);
+
+      const feedbackData = {
+        rating: selectedRating,
+        timestamp: Date.now()
+      };
+
+      // Save/overwrite feedback for this userKey
+      feedbackRef.set(feedbackData).then(() => {
+        alert("Thank you for your feedback! 💖");
+        closeFeedback();
+        selectedRating = 0;
+        document.querySelectorAll(".star").forEach(s => s.classList.remove("selected"));
+      });
+    }
+
+
+
+    function showFeedback() {
+      loadAverageRating(); // ✅ Call this first
+      document.getElementById("feedbackModal").style.display = "flex";
+    }
+
+    function closeFeedback() {
+      document.getElementById("feedbackModal").style.display = "none";
+    }
+
+    function loadAverageRating() {
+      const avgEl = document.getElementById("avgRatingValue");
+      const ref = firebase.database().ref("feedbacks");
+
+      ref.once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+          avgEl.textContent = "No ratings yet.";
+          return;
+        }
+
+        const ratings = Object.values(data).map(f => f.rating);
+        const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+
+        // Format to 1 decimal
+        const formatted = average.toFixed(1);
+        
+        // Show stars with number
+        avgEl.innerHTML = `⭐ ${formatted} (${ratings.length} votes)`;
+      });
+    }

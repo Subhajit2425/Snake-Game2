@@ -324,6 +324,7 @@ html, body {
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
       position: fixed;
       top: 0;
       left: 0;
@@ -331,33 +332,51 @@ html, body {
       height: 100vh;
       background: black;
       color: white;
-      font-size: 20px;
       font-family: monospace;
       z-index: 9999;
       text-align: center;
     }
 
+    .dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
     .dot {
-      display: inline-block;
       font-size: 4rem;
-      animation: dotPulse 1.4s infinite;
-      margin: 0 2px;
-      transform-origin: center;
-      
+      animation: colorCycle 1.5s infinite;
     }
 
     #dot1 { animation-delay: 0s; }
-    #dot2 { animation-delay: 0.2s; }
-    #dot3 { animation-delay: 0.4s; }
+    #dot2 { animation-delay: 0.5s; }
+    #dot3 { animation-delay: 1s; }
 
-    @keyframes dotPulse {
-      0%   { color: rgb(238, 81, 42); }
-      33%  { color: rgb(214, 236, 71); }
-      66%  { color: rgb(18, 184, 18); }
-      100% { color: rgb(235, 151, 41); }
+    @keyframes colorCycle {
+      0%   { color: rgb(255, 255, 0); }
+      33%  { color: rgb(255, 165, 0); }
+      66%  { color: rgb(14, 195, 14); }
+      100% { color: rgb(255, 255, 0); }
     }
 
-    .dots {
-      display: inline-block;
-      white-space: nowrap;
+    .stars {
+      display: flex;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin: 10px 0;
+      gap: 10px;
+    }
+
+    .star {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .star:hover {
+      transform: scale(1.2);
+    }
+
+    .star.selected {
+      color: gold;
     }

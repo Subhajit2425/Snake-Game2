@@ -26,6 +26,7 @@
       <button onclick="showLeaderboard()">Leaderboard</button>
       <button onclick="if (confirm('Are You Sure You Want To Edit Your User Name ?')) editUsername()">Edit Name</button>
       <button onclick="showAbout()">About</button> <!-- 👈 New button -->
+      <button onclick="showFeedback()">Feedback</button>
     </div>
   </div>
 
@@ -134,13 +135,12 @@
 
   <div id="loadingOverlay">
     <div>
-      <p>Please Wait<br>Checking Your Account<br>
+      <h2>Please Wait<br>Loading Game Content...</h2>
         <span class="dots">
-          <span class="dot" id="dot1">.</span>
-          <span class="dot" id="dot2">.</span>
-          <span class="dot" id="dot3">.</span>
+          <span class="dot" id="dot1" style="color: rgb(255, 255, 0);">.</span>
+          <span class="dot" id="dot2" style="color: rgb(255, 165, 0);">.</span>
+          <span class="dot" id="dot3" style="color: rgb(14, 195, 14);">.</span>
         </span>
-      </p>
     </div>
   </div>
 
@@ -199,6 +199,29 @@
       <h2> 🏆 Top Highscorers 🏆 </h2>
       <ul id="leaderboardList" style="list-style: none; padding: 0; text-align: center;"></ul>
       <button onclick="closeLeaderboard()">Close</button>
+    </div>
+  </div>
+
+  <div id="feedbackModal" class="modal">
+    <div class="modal-content">
+      <h2 class="About">🌟 Feedback</h2>
+
+      <div id="averageRating" style="font-size: 1.2rem; margin-bottom: 10px;">
+        <span id="avgRatingValue">⭐️⭐️⭐️⭐️⭐️</span>
+      </div>
+
+      <p>How was your experience with the Snake Game?</p>
+      
+      <div id="starRating" class="stars">
+        <span class="star" data-value="1">⭐</span>
+        <span class="star" data-value="2">⭐</span>
+        <span class="star" data-value="3">⭐</span>
+        <span class="star" data-value="4">⭐</span>
+        <span class="star" data-value="5">⭐</span>
+      </div>
+      
+      <button onclick="submitFeedback()">Submit Feedback</button>
+      <button onclick="closeFeedback()">Cancel</button>
     </div>
   </div>
 
