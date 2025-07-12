@@ -31,6 +31,7 @@ html, body {
       background-color: black;
       display: block;
       margin: 0;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 10px rgba(255, 255, 255, 0.1);
     }
 
     .overlay {
@@ -80,10 +81,9 @@ html, body {
       box-shadow: 0 0 15px rgb(0, 255, 225);
       text-align: center;
       color: white;
-      max-width: 600px;
+      max-width: 500px;
       animation: fadeIn 0.5s ease-in-out;
       max-height: 80vh;
-      overflow-y: auto;
     }
 
     .modal-content a {
@@ -133,14 +133,21 @@ html, body {
     }
 
     #SnakeM, #OverHeader, .About {
-      font-size: 2.5rem;
+      font-size: 1.5rem;
       letter-spacing: 2px;
       background: linear-gradient(90deg, #00ffea, #5b42f3, #ff3c83);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      margin-top: 10px; /* ✅ Add this line */
       animation: pulseText 3s infinite;
       margin-bottom: 20px;
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    #SnakeM, #OverHeader {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 2rem;
     }
 
     .hidden { display: none; }
@@ -212,10 +219,10 @@ html, body {
     }
 
     #userList {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        font-family: monospace;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-family: monospace;
     }
 
     .countdown-overlay {
@@ -281,6 +288,11 @@ html, body {
       list-style: none;
       padding: 0;
       margin: 0;
+      font-family: monospace;
+      max-height: 80vh; /* ✅ limits scroll area */
+      overflow-y: auto; /* ✅ scroll here */
+      width: 100%;
+      align-items: center;
     }
 
     /* Each community item */

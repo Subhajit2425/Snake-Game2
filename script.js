@@ -105,7 +105,7 @@ const gameDiv = document.getElementById('game');
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           // Alternate between black and dark gray
-          ctx.fillStyle = (row + col) % 2 === 0 ? "#000000" : "#111111";
+          ctx.fillStyle = (row + col) % 2 === 0 ? "#222222" : "#111111";
           ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
         }
       }
@@ -600,13 +600,21 @@ const gameDiv = document.getElementById('game');
 
 
     function editUsername() {
-      const currentName = localStorage.getItem("playerName");
-      document.getElementById("editNameInput").value = currentName || '';
+      if (!navigator.onLine) {
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again.");
+        return;
+      }
+
+      const currentName = localStorage.getItem("playerName") || '';
+      const input = document.getElementById("editNameInput");
+      input.value = currentName.trim();
       document.getElementById("editUsernameModal").style.display = "flex";
+      input.focus();
     }
+    
 
     function submitEditedUsername() {
-      const newName = document.getElementById("editNameInput").value.trim();
+      const newName = document.getElementById("alert").value.trim();
       const key = localStorage.getItem("userKey");
 
       if (!key || !newName) {
