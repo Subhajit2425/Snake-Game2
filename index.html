@@ -131,10 +131,19 @@
     </div>
   </div>
 
-   <!-- ✅ Loading overlay -->
-  <div id="loadingOverlay" style="display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; color: white; font-size: 20px; z-index: 9999;">
-      Please Wait <br> Checking Your Account <br>          ...  
+
+  <div id="loadingOverlay">
+    <div>
+      <p>Please Wait<br>Checking Your Account<br>
+        <span class="dots">
+          <span class="dot" id="dot1">.</span>
+          <span class="dot" id="dot2">.</span>
+          <span class="dot" id="dot3">.</span>
+        </span>
+      </p>
+    </div>
   </div>
+
 
   <!-- ✅ Login Modal -->
   <div id="loginModal" class="modal" style="display: none;">

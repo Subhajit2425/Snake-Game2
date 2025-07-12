@@ -28,11 +28,12 @@ html, body {
 
     canvas {
       border: 2px solid white;
-      background-color: black;
       display: block;
       margin: 0;
+      background-color: black;
       box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 10px rgba(255, 255, 255, 0.1);
     }
+
 
     .overlay {
       position: absolute;
@@ -172,6 +173,7 @@ html, body {
       background: linear-gradient(135deg, rgb(172, 15, 91), #4516b4);
       transform: scale(1.05);
       border-color: rgb(0, 240, 240);
+      box-shadow: 0 0 10px #9f79ff;
     }
 
     .exitBtn {
@@ -316,4 +318,46 @@ html, body {
     /* Name */
     .community-name {
       flex-grow: 1;
+    }
+
+    #loadingOverlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      color: white;
+      font-size: 20px;
+      font-family: monospace;
+      z-index: 9999;
+      text-align: center;
+    }
+
+    .dot {
+      display: inline-block;
+      font-size: 4rem;
+      animation: dotPulse 1.4s infinite;
+      margin: 0 2px;
+      transform-origin: center;
+      
+    }
+
+    #dot1 { animation-delay: 0s; }
+    #dot2 { animation-delay: 0.2s; }
+    #dot3 { animation-delay: 0.4s; }
+
+    @keyframes dotPulse {
+      0%   { color: rgb(238, 81, 42); }
+      33%  { color: rgb(214, 236, 71); }
+      66%  { color: rgb(18, 184, 18); }
+      100% { color: rgb(235, 151, 41); }
+    }
+
+    .dots {
+      display: inline-block;
+      white-space: nowrap;
     }
