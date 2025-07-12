@@ -105,7 +105,7 @@ const gameDiv = document.getElementById('game');
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           // Alternate between black and dark gray
-          ctx.fillStyle = (row + col) % 2 === 0 ? "#222222" : "#111111";
+          ctx.fillStyle = (row + col) % 2 === 0 ? "#000000" : "#111111";
           ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
         }
       }
