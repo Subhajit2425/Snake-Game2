@@ -751,28 +751,29 @@ const gameDiv = document.getElementById('game');
     let selectedRating = 0;
 
     document.querySelectorAll(".star").forEach(star => {
-      star.addEventListener("click", function () {
-        selectedRating = parseInt(this.dataset.value);
+      star.addEventListener("click", () => {
+        selectedRating = parseInt(star.getAttribute("data-value"));
 
-        // Highlight selected stars
-        document.querySelectorAll(".star").forEach(s => {
-          s.classList.remove("selected");
-          if (parseInt(s.dataset.value) <= selectedRating) {
-            s.classList.add("selected");
-          }
-        });
+        // Clear all stars
+        document.querySelectorAll(".star").forEach(s => s.classList.remove("selected"));
+
+        // Highlight up to the selected star
+        for (let i = 1; i <= selectedRating; i++) {
+          document.querySelector(`.star[data-value="${i}"]`).classList.add("selected");
+        }
       });
     });
 
+
     function submitFeedback() {
       if (selectedRating === 0) {
-        alert("Please select a rating.");
+        alert("Please Select A Rating.");
         return;
       }
 
       const userKey = localStorage.getItem("userKey");
       if (!userKey) {
-        alert("User not identified. Please log in again.");
+        alert("User Not Identified. Please Log In Again.");
         return;
       }
 
@@ -785,7 +786,7 @@ const gameDiv = document.getElementById('game');
 
       // Save/overwrite feedback for this userKey
       feedbackRef.set(feedbackData).then(() => {
-        alert("Thank you for your feedback! 💖");
+        alert("Thank You For Your Feedback! 💖");
         closeFeedback();
         selectedRating = 0;
         document.querySelectorAll(".star").forEach(s => s.classList.remove("selected"));
@@ -795,13 +796,21 @@ const gameDiv = document.getElementById('game');
 
 
     function showFeedback() {
-      loadAverageRating(); // ✅ Call this first
-      document.getElementById("feedbackModal").style.display = "flex";
+      // ✅ Check for internet connection first
+      if (!navigator.onLine) {
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again.");
+        return;
+      }
+
+      loadAverageRating(); // ✅ Load and show average stars
+      document.getElementById("feedbackModal").style.display = "flex"; // ✅ Show modal
     }
+
 
     function closeFeedback() {
       document.getElementById("feedbackModal").style.display = "none";
     }
+
 
     function loadAverageRating() {
       const avgEl = document.getElementById("avgRatingValue");

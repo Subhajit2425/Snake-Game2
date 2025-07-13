@@ -369,8 +369,10 @@ html, body {
     }
 
     .star {
+      font-size: 3rem;
+      color: white; /* default */
       cursor: pointer;
-      transition: transform 0.2s ease;
+      transition: color 0.3s, transform 0.2s;
     }
 
     .star:hover {
@@ -379,4 +381,5 @@ html, body {
 
     .star.selected {
       color: gold;
+      transform: scale(1.2);
     }
