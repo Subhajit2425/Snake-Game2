@@ -24,7 +24,7 @@
       <button onclick="showUsers()">Community</button>
       <button onclick="showInstruction()">Instructions</button>
       <button onclick="showLeaderboard()">Leaderboard</button>
-      <button onclick="if (confirm('Are You Sure You Want To Edit Your User Name ?')) editUsername()">Edit Name</button>
+      <button onclick="confirmEdit()">Edit Name</button>
       <button onclick="showFeedback()">Feedback</button>     
       <button onclick="showAbout()">About</button> <!-- 👈 New button -->
     </div>
@@ -80,6 +80,7 @@
   <audio id="gameOverSound" src="assets/gameOverSound.mp3"></audio>
   <audio id="countdownSound" src="assets/countdownSound.mp3"></audio>
   <audio id="goSound" src="assets/goSound.mp3"></audio>
+  <audio id="buttonSound" src="assets/buttonSound.mp3"></audio>
 
 
   <div id="difficultyModal" class="modal" >

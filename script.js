@@ -83,6 +83,8 @@ const gameDiv = document.getElementById('game');
     }
 
     function showMenu() {
+      playButtonSound();
+
       document.getElementById("menu").style.display = "flex"; // 👈 restore buttons
       document.getElementById("difficultyModal").style.display = "none"; // Add this
       gameDiv.classList.add("hidden");
@@ -92,6 +94,8 @@ const gameDiv = document.getElementById('game');
     }
 
     function confirmExit() {
+      playButtonSound();
+
       if (!isPaused) pauseGame();
       const confirmLeave = confirm("Are You Sure You Want To Exit To The Main Menu ?");
       if (confirmLeave) {
@@ -255,11 +259,14 @@ const gameDiv = document.getElementById('game');
     }
 
     function selectDifficulty() {
+      playButtonSound();
+
       // Show the difficulty selection modal
       document.getElementById("difficultyModal").style.display = "flex";
     }
 
     function closeDifficulty() {
+      playButtonSound();
       document.getElementById("difficultyModal").style.display = "none";
     }
 
@@ -290,19 +297,23 @@ const gameDiv = document.getElementById('game');
 
 
     function showInstruction() {
+      playButtonSound();
       document.getElementById("instructionModal").style.display = "flex";
     }
 
     function closeInstructions() {
+      playButtonSound();
       document.getElementById("instructionModal").style.display = "none";
     }
 
 
     function showAbout() {
+      playButtonSound();
       document.getElementById("aboutModal").style.display = "flex";
     }
 
     function closeAbout() {
+      playButtonSound();
       document.getElementById("aboutModal").style.display = "none";
     }
 
@@ -313,6 +324,7 @@ const gameDiv = document.getElementById('game');
     }
 
     function closeCongratulations() {
+      playButtonSound();
       document.getElementById("CongratulationsModal").style.display = "none";
     }
 
@@ -499,6 +511,8 @@ const gameDiv = document.getElementById('game');
 
 
     function showUsers() {
+      playButtonSound();
+
       // ✅ Check for internet connection first
       if (!navigator.onLine) {
         alert("⚠️ Internet Connection Is Slow or Unavailable.\n Please Check Your Connection And Try Again.");
@@ -548,7 +562,8 @@ const gameDiv = document.getElementById('game');
 
 
     function closeUsers() {
-        document.getElementById("usersModal").style.display = "none";
+      playButtonSound();
+      document.getElementById("usersModal").style.display = "none";
     }
 
 
@@ -585,6 +600,7 @@ const gameDiv = document.getElementById('game');
 
 
     function togglePause() {
+      playButtonSound();
       if (!gameRunning) return;
 
       if (isPaused) {
@@ -599,7 +615,20 @@ const gameDiv = document.getElementById('game');
     }
 
 
+    function confirmEdit() {
+      playButtonSound();
+
+      if (confirm('Are You Sure You Want To Edit Your User Name ?')) {
+        editUsername()
+      } else {
+        return;
+      }
+    }
+
+
     function editUsername() {
+      playButtonSound();
+
       if (!navigator.onLine) {
         alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again.");
         return;
@@ -614,6 +643,8 @@ const gameDiv = document.getElementById('game');
     
 
     function submitEditedUsername() {
+      playButtonSound();
+
       const newName = document.getElementById("alert").value.trim();
       const key = localStorage.getItem("userKey");
 
@@ -634,6 +665,7 @@ const gameDiv = document.getElementById('game');
     }
 
     function closeEditUsername() {
+      playButtonSound();
       document.getElementById("editUsernameModal").style.display = "none";
     }
 
@@ -697,6 +729,8 @@ const gameDiv = document.getElementById('game');
 
 
     function showLeaderboard() {
+      playButtonSound();
+
       // ✅ Check for internet connection first
       if (!navigator.onLine) {
         alert("⚠️ Internet Connection Is Slow or Unavailable.\n Please Check Your Connection And Try Again.");
@@ -745,6 +779,7 @@ const gameDiv = document.getElementById('game');
 
 
     function closeLeaderboard() {
+      playButtonSound();
       document.getElementById("leaderboardModal").style.display = "none";
     }
 
@@ -766,6 +801,8 @@ const gameDiv = document.getElementById('game');
 
 
     function submitFeedback() {
+      playButtonSound();
+
       if (selectedRating === 0) {
         alert("Please Select A Rating.");
         return;
@@ -787,7 +824,6 @@ const gameDiv = document.getElementById('game');
       // Save/overwrite feedback for this userKey
       feedbackRef.set(feedbackData).then(() => {
         alert("Thank You For Your Feedback! 💖");
-        closeFeedback();
         selectedRating = 0;
         document.querySelectorAll(".star").forEach(s => s.classList.remove("selected"));
       });
@@ -796,6 +832,8 @@ const gameDiv = document.getElementById('game');
 
 
     function showFeedback() {
+      playButtonSound();
+
       // ✅ Check for internet connection first
       if (!navigator.onLine) {
         alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again.");
@@ -808,6 +846,7 @@ const gameDiv = document.getElementById('game');
 
 
     function closeFeedback() {
+      playButtonSound();
       document.getElementById("feedbackModal").style.display = "none";
     }
 
@@ -832,4 +871,17 @@ const gameDiv = document.getElementById('game');
         // Show stars with number
         avgEl.innerHTML = `⭐ ${formatted} (${ratings.length} votes)`;
       });
+    }
+
+    function playButtonSound() {
+      const sound = document.getElementById("buttonSound");
+      sound.volume = 0.5;
+      if (sound) {
+        try {
+          sound.currentTime = 0;
+          sound.play();
+        } catch (e) {
+          // Sound couldn't be played due to browser restrictions
+        }
+      }
     }
