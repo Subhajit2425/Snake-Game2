@@ -20,6 +20,7 @@ const gameDiv = document.getElementById('game');
     const gameOverSound = document.getElementById('gameOverSound');
     const countdownSound = document.getElementById('countdownSound');
     const goSound = document.getElementById('goSound');
+    const buttonSound = document.getElementById("buttonSound");
 
 
     function isOccupied(x, y, snakeHead, tail, fruits,  obstacles) {
@@ -873,13 +874,12 @@ const gameDiv = document.getElementById('game');
       });
     }
 
-    function playButtonSound() {
-      const sound = document.getElementById("buttonSound");
-      sound.volume = 0.5;
-      if (sound) {
+    function playButtonSound() {      
+      buttonSound.volume = 0.5;
+      if (buttonSound) {
         try {
-          sound.currentTime = 0;
-          sound.play();
+          buttonSound.currentTime = 0;
+          buttonSound.play();
         } catch (e) {
           // Sound couldn't be played due to browser restrictions
         }
