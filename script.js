@@ -13,6 +13,8 @@ const gameDiv = document.getElementById('game');
     let isCountingDown = false;
     let x, y, dx, dy, score, nTail, tail, fruit, fruitNo = 5, obstacles, gameOver = false, dir = 'UP', gameNo = 0, isPaused = false;
     let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false, obstacleCount = 20;
+    let directionLocked = false;
+
 
     const startSound = document.getElementById('startSound');
     const eatSound = document.getElementById('eatSound');
@@ -211,6 +213,8 @@ const gameDiv = document.getElementById('game');
             fruit[i] = getValidPosition({x, y}, tail, fruit, obstacles, cols, rows);
             }
         }
+
+        directionLocked = false; // ✅ allow next input after frame is processed
     }
 
 
@@ -338,13 +342,11 @@ const gameDiv = document.getElementById('game');
 
 
     function move(newDir) {
-      if (!gameRunning) return; // game not started yet
+      if (!gameRunning || directionLocked) return;
 
-      // Only allow first direction to start game
       if (!dir) {
         dir = newDir;
       } else {
-        // Prevent reverse movement
         if (
           (newDir === 'UP' && dir !== 'DOWN') ||
           (newDir === 'DOWN' && dir !== 'UP') ||
@@ -352,9 +354,11 @@ const gameDiv = document.getElementById('game');
           (newDir === 'RIGHT' && dir !== 'LEFT')
         ) {
           dir = newDir;
+          directionLocked = true; // ✅ prevent further change until next frame
         }
       }
     }
+
 
     // ✅ Keyboard Controls
     window.addEventListener("keydown", e => {
