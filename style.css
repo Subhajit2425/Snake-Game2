@@ -354,10 +354,10 @@ html, body {
     #dot3 { animation-delay: 1s; }
 
     @keyframes colorCycle {
-      0%   { color: rgb(255, 255, 0); }
-      33%  { color: rgb(255, 165, 0); }
-      66%  { color: rgb(14, 195, 14); }
-      100% { color: rgb(255, 255, 0); }
+      0%   { color: rgb(0, 255, 234); }
+      33%  { color: #5b42f3; }
+      66%  { color: #ff3c83; }
+      100% { color: rgb(0, 255, 234); }
     }
 
     .stars {
