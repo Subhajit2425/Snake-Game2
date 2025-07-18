@@ -1,25 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // ✅ Check if browser is Chrome
-  const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor || '');
-
-  if (!isChrome) {
-    const warning = document.createElement("div");
-    warning.innerHTML = "⚠️ For best experience, use Google Chrome.";
-    warning.style.position = "fixed";
-    warning.style.top = "0";
-    warning.style.left = "0";
-    warning.style.width = "100%";
-    warning.style.background = "#ffcc00";
-    warning.style.color = "#000";
-    warning.style.textAlign = "center";
-    warning.style.padding = "10px";
-    warning.style.zIndex = "9999";
-    warning.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
-    warning.style.fontSize = "16px";
-    document.body.appendChild(warning);
-  }   
-    
-    const gameDiv = document.getElementById('game');
+const gameDiv = document.getElementById('game');
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -963,4 +942,4 @@ document.addEventListener("DOMContentLoaded", function () {
         navigator.vibrate(pattern);
       }
     }
-});
+
