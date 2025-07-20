@@ -1,4 +1,5 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
+  // ✅ Check if browser is Chrome
   const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor || '');
 
   if (!isChrome) {
@@ -13,30 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
     warning.style.textAlign = "center";
     warning.style.padding = "10px";
     warning.style.zIndex = "9999";
+    warning.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
+    warning.style.fontSize = "16px";
     document.body.appendChild(warning);
-  }
-
-  let userKey = null;
-  let playerName = null;
-
-  try {
-    userKey = localStorage.getItem("userKey");
-    playerName = localStorage.getItem("playerName");
-  } catch (e) {
-    console.warn("⚠️ LocalStorage unavailable. User may not be remembered.");
-  }
-
-  if (userKey && playerName) {
-    // ✅ Welcome back user
-    document.getElementById("menu").style.display = "flex";
-    document.getElementById("loginModal").style.display = "none";
-    // Optionally show a welcome message
-    document.getElementById("welcomeUserName").textContent = playerName;
-  } else {
-    // 📝 Ask user to enter name again
-    document.getElementById("loginModal").style.display = "flex";
-    document.getElementById("menu").style.display = "none";
-  }
+  }    
     
     const gameDiv = document.getElementById('game');
     const canvas = document.getElementById("gameCanvas");
