@@ -1,4 +1,44 @@
-    const gameDiv = document.getElementById('game');
+document.addEventListener("DOMContentLoaded", () => {
+  const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor || '');
+
+  if (!isChrome) {
+    const warning = document.createElement("div");
+    warning.innerHTML = "⚠️ For best experience, use Google Chrome.";
+    warning.style.position = "fixed";
+    warning.style.top = "0";
+    warning.style.left = "0";
+    warning.style.width = "100%";
+    warning.style.background = "#ffcc00";
+    warning.style.color = "#000";
+    warning.style.textAlign = "center";
+    warning.style.padding = "10px";
+    warning.style.zIndex = "9999";
+    document.body.appendChild(warning);
+  }
+
+  let userKey = null;
+  let playerName = null;
+
+  try {
+    userKey = localStorage.getItem("userKey");
+    playerName = localStorage.getItem("playerName");
+  } catch (e) {
+    console.warn("⚠️ LocalStorage unavailable. User may not be remembered.");
+  }
+
+  if (userKey && playerName) {
+    // ✅ Welcome back user
+    document.getElementById("menu").style.display = "flex";
+    document.getElementById("loginModal").style.display = "none";
+    // Optionally show a welcome message
+    document.getElementById("welcomeUserName").textContent = playerName;
+  } else {
+    // 📝 Ask user to enter name again
+    document.getElementById("loginModal").style.display = "flex";
+    document.getElementById("menu").style.display = "none";
+  }
+
+const gameDiv = document.getElementById('game');
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -942,3 +982,4 @@
         navigator.vibrate(pattern);
       }
     }
+});
