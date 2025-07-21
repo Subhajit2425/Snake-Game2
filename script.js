@@ -784,51 +784,50 @@ const gameDiv = document.getElementById('game');
     function showLeaderboard() {
       playButtonSound();
 
-      // ✅ Check for internet connection first
       if (!navigator.onLine) {
-        alert("⚠️ Internet Connection Is Slow or Unavailable.\n Please Check Your Connection And Try Again.");
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again.");
         return;
       }
 
       const list = document.getElementById("leaderboardList");
       list.innerHTML = "";
 
-      firebase.database().ref("highscores")
-        .once("value", snapshot => {
-          const scores = [];
+      firebase.database().ref("users").once("value").then(snapshot => {
+        const scores = [];
 
-          snapshot.forEach(child => {
-            const entry = child.val();
+        snapshot.forEach(child => {
+          const data = child.val();
+          if (data.highScore !== undefined) {
             scores.push({
-              name: entry.name,
-              score: entry.score
+              name: data.name || "Unknown",
+              score: data.highScore
             });
-          });
-
-          // Sort scores descending
-          scores.sort((a, b) => b.score - a.score);
-
-          // Top 10
-          scores.slice(0, 10).forEach((entry, index) => {
-            const li = document.createElement("li");
-            li.classList.add("leaderboard-item");
-
-            const serial = document.createElement("span");
-            serial.textContent = `${index + 1}.`;
-            serial.classList.add("leaderboard-serial");
-
-            const nameScore = document.createElement("span");
-            nameScore.innerHTML = `${entry.name} – <span>${entry.score}</span>`;
-            nameScore.classList.add("leaderboard-name-score");
-
-            li.appendChild(serial);
-            li.appendChild(nameScore);
-            list.appendChild(li);
-          });
-
-          document.getElementById("leaderboardModal").style.display = "flex";
+          }
         });
+
+        scores.sort((a, b) => b.score - a.score);
+
+        scores.slice(0, 10).forEach((entry, index) => {
+          const li = document.createElement("li");
+          li.classList.add("leaderboard-item");
+
+          const serial = document.createElement("span");
+          serial.textContent = `${index + 1}.`;
+          serial.classList.add("leaderboard-serial");
+
+          const nameScore = document.createElement("span");
+          nameScore.innerHTML = `${entry.name} – <span>${entry.score}</span>`;
+          nameScore.classList.add("leaderboard-name-score");
+
+          li.appendChild(serial);
+          li.appendChild(nameScore);
+          list.appendChild(li);
+        });
+
+        document.getElementById("leaderboardModal").style.display = "flex";
+      });
     }
+
 
 
     function closeLeaderboard() {
@@ -1027,13 +1026,30 @@ const gameDiv = document.getElementById('game');
       });
     }
 
-    function showAdminDelete() {
+    function showAdminUse() {
       if (localStorage.getItem("sound") !== "off") {
         buttonSound.play();
       }
       if (confirm("⚠️ It Is Only For Admin Use. Are You Sure ?")) {
-        document.getElementById('adminDeleteModal').style.display = 'flex';
+        document.getElementById('adminUseModal').style.display = 'flex';
       }
+    }
+
+    function closeAdminUse() {
+      if (localStorage.getItem("sound") !== "off") {
+        buttonSound.play();
+      }
+
+      document.getElementById('adminUseModal').style.display = 'none';
+    }
+
+    function showAdminDelete() {
+      if (localStorage.getItem("sound") !== "off") {
+        buttonSound.play();
+      }
+      
+      document.getElementById('adminUseModal').style.display = 'none';
+      document.getElementById('adminDeleteModal').style.display = 'flex';
     }
 
     function closeAdminDelete() {
@@ -1041,6 +1057,7 @@ const gameDiv = document.getElementById('game');
         buttonSound.play();
       }
       document.getElementById('adminDeleteModal').style.display = 'none';
+      document.getElementById('adminUseModal').style.display = 'flex';
     }
 
     const settingsBtn = document.getElementById("settingsBtn");
@@ -1077,3 +1094,71 @@ const gameDiv = document.getElementById('game');
       localStorage.setItem("vibration", vibrationToggle.checked ? "on" : "off");
     }
 
+    function showEditHighscore() {
+      if (localStorage.getItem("sound") !== "off") {
+        buttonSound.play();
+      }
+      
+      document.getElementById('adminUseModal').style.display = 'none';
+      document.getElementById('adminUpdateContainer').style.display = 'flex';
+    }
+
+    function closeEditHighscore() {
+      if (localStorage.getItem("sound") !== "off") {
+        buttonSound.play();
+      }
+      
+      document.getElementById('adminUseModal').style.display = 'flex';
+      document.getElementById('adminUpdateContainer').style.display = 'none';
+    }
+
+
+    document.getElementById("updateScoreBtn").addEventListener("click", () => {
+      const name = document.getElementById("updateName").value.trim();
+      const serial = parseInt(document.getElementById("updateSerial").value.trim());
+      const newHighScore = parseInt(document.getElementById("updateHighScore").value.trim());
+
+      if (!name || isNaN(serial) || isNaN(newHighScore)) {
+        alert("⚠️ Please fill in all fields correctly.");
+        return;
+      }
+
+      firebase.database().ref("users").once("value", snapshot => {
+        if (!snapshot.exists()) {
+          alert("❌ No users found in database.");
+          return;
+        }
+
+        // 🔍 Find all users with the given name
+        const matchingUsers = [];
+        snapshot.forEach(child => {
+          const userData = child.val();
+          if (userData.name && userData.name.trim().toLowerCase() === name.toLowerCase()) {
+            matchingUsers.push({ key: child.key, ...userData });
+          }
+        });
+
+        if (matchingUsers.length === 0) {
+          alert(`❌ No user found with the name "${name}".`);
+          return;
+        }
+
+        if (serial < 1 || serial > matchingUsers.length) {
+          alert(`❌ Invalid serial number. Only ${matchingUsers.length} users found with name "${name}".`);
+          return;
+        }
+
+        const selectedUser = matchingUsers[serial - 1];
+        console.log("Updating user:", selectedUser);
+
+        firebase.database().ref("users/" + selectedUser.key).update({
+          highScore: newHighScore
+        }).then(() => {
+          alert(`✅ High score updated to ${newHighScore} for "${name}" (#${serial}).`);
+          document.getElementById('adminUseModal').style.display = 'none';
+          document.getElementById('adminUpdateContainer').style.display = 'none';
+        }).catch(error => {
+          alert("❌ Error updating high score: " + error.message);
+        });
+      });
+    });

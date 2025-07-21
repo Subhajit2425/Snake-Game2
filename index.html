@@ -52,7 +52,7 @@
       <button onclick="showAbout()">About</button> <!-- 👈 New button -->
       <!-- Admin Trigger Button -->
       <div id="adminDeleteContainer" style="display: none;">
-        <button onclick="showAdminDelete()">Admin Use</button>
+        <button onclick="showAdminUse()">Admin Use</button>
       </div>
     </div>
   </div>
@@ -253,18 +253,6 @@
     </div>
   </div>
 
-  <!-- Admin Delete Modal -->
-  <div id="adminDeleteModal" class="modal">
-    <div class="modal-content">
-      <h3>🔒 Admin Delete Tool</h3>
-      <label>Enter Name:</label>
-      <input type="text" id="deleteName" placeholder="e.g. Subhajit"><br><br>
-      <label>Serial No.:</label>
-      <input type="number" id="deleteSerial" placeholder="1 for first"><br><br>
-      <button onclick="deleteUserByNameSerial()">Delete</button>
-      <button class="exitBtn" onclick="closeAdminDelete()">Cancel</button>
-    </div>
-  </div>
 
   <div id="settingsModal" class="modal">
     <div class="modal-content">
@@ -283,6 +271,41 @@
     </div>
   </div>
 
+
+  <!-- Admin Delete Modal -->
+  <div id="adminUseModal" class="modal">
+    <div class="modal-content">
+      <h2 class="About"> 🔒 Admin Use </h2>
+      <button onclick="showAdminDelete()"> Delete User</button>
+      <button onclick="showEditHighscore()">Edit High Scorers</button>
+      <button class="exitBtn" onclick="closeAdminUse()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Admin Delete Modal -->
+  <div id="adminDeleteModal" class="modal">
+    <div class="modal-content">
+      <h2 class="About"> 🔒 Admin Delete Tool </h2>
+      <label>Enter Name:</label>
+      <input type="text" id="deleteName" placeholder="e.g. Subhajit"><br><br>
+      <label>Serial No.:</label>
+      <input type="number" id="deleteSerial" placeholder="1 for first"><br><br>
+      <button onclick="deleteUserByNameSerial()">Delete</button>
+      <button class="exitBtn" onclick="closeAdminDelete()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="adminUpdateContainer" class="modal">
+    <div class="modal-content">
+      <h2 class="About"> Update High Score </h2>
+      <input type="text" id="updateName" placeholder="Enter Player Name">
+      <input type="number" id="updateSerial" placeholder="Enter Times Played (Serial)">
+      <input type="number" id="updateHighScore" placeholder="New High Score">
+      <button id="updateScoreBtn">Save</button>
+      <button class="exitBtn" onclick="closeEditHighscore()">Close</button>
+      <p id="updateStatus" style="color:rgb(255, 0, 0);"></p>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 
