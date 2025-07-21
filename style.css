@@ -383,3 +383,7 @@ html, body {
       color: gold;
       transform: scale(1.2);
     }
+
+    #adminDeleteContainer {
+      display: none;
+    }

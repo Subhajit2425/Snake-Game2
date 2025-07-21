@@ -449,32 +449,44 @@ const gameDiv = document.getElementById('game');
       const loading = document.getElementById("loadingOverlay");
       const login = document.getElementById("loginModal");
       const menu = document.getElementById("menu");
+      const deleteBtnContainer = document.getElementById("adminDeleteContainer");
 
-      loading.style.display = "flex"; // Show loading first
+      const ADMIN_ID = "-OU-qe8pVdrrgG0ameZh"; // 🔒 Replace this with your actual Firebase user key
+
+      loading.style.display = "flex";
       login.style.display = "none";
       menu.style.display = "none";
+
+      function checkAdminShowButton(currentKey) {
+        if (deleteBtnContainer) {
+          if (currentKey === ADMIN_ID) {
+            deleteBtnContainer.style.display = "flex";
+          } else {
+            deleteBtnContainer.style.display = "none";
+          }
+        }
+      }
 
       if (userKey) {
         firebase.database().ref("users/" + userKey).once("value").then(snapshot => {
           const userData = snapshot.val();
           if (userData) {
-            // ✅ Valid returning user
             localStorage.setItem("playerName", userData.name);
             loading.style.display = "none";
             menu.style.display = "flex";
+            checkAdminShowButton(userKey); // ✅ check admin here
           } else {
-            // ❌ Invalid user key
             localStorage.removeItem("userKey");
             loading.style.display = "none";
             login.style.display = "flex";
           }
         });
       } else if (playerName) {
-        // Might be an old user (no key, only name)
         firebase.database().ref("users").orderByChild("name").equalTo(playerName).once("value", snapshot => {
           if (snapshot.exists()) {
             snapshot.forEach(child => {
               localStorage.setItem("userKey", child.key);
+              checkAdminShowButton(child.key); // ✅ check admin here
             });
             loading.style.display = "none";
             menu.style.display = "flex";
@@ -484,11 +496,11 @@ const gameDiv = document.getElementById('game');
           }
         });
       } else {
-        // First time user
         loading.style.display = "none";
         login.style.display = "flex";
       }
     });
+
 
 
     function submitName() {
@@ -943,3 +955,58 @@ const gameDiv = document.getElementById('game');
       }
     }
 
+    function deleteUserByNameSerial() {
+      const nameToDelete = document.getElementById("deleteName").value.trim();
+      const serial = parseInt(document.getElementById("deleteSerial").value);
+
+      if (!nameToDelete || isNaN(serial)) {
+        alert("Please enter both name and serial number.");
+        return;
+      }
+
+      let matchedCount = 0;
+
+      firebase.database().ref("users").once("value", (snapshot) => {
+        const users = snapshot.val();
+
+        if (!users) {
+          alert("No users found.");
+          return;
+        }
+
+        for (const userKey in users) {
+          const userData = users[userKey];
+          if (userData.name === nameToDelete) {
+            matchedCount++;
+            if (matchedCount === serial) {
+              // Delete the matched user
+              firebase.database().ref("users/" + userKey).remove()
+                .then(() => {
+                  alert(`✅ User "${nameToDelete}" (match #${serial}) deleted successfully.`);
+                  closeAdminDelete();
+                })
+                .catch((error) => {
+                  console.error("Delete failed:", error);
+                  alert("❌ Error deleting user.");
+                });
+              return;
+            }
+          }
+        }
+
+        // If match not found
+        if (matchedCount < serial) {
+          alert(`⚠️ Only ${matchedCount} "${nameToDelete}" found. Serial #${serial} doesn't exist.`);
+        }
+      });
+    }
+
+    function showAdminDelete() {
+      if (confirm("⚠️ It Is Only For Admin Use. Are You Sure ?")) {
+        document.getElementById('adminDeleteModal').style.display = 'flex';
+      }
+    }
+
+    function closeAdminDelete() {
+      document.getElementById('adminDeleteModal').style.display = 'none';
+    }
