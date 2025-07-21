@@ -46,12 +46,13 @@
       <button onclick="showUsers()">Community</button>
       <button onclick="showInstruction()">Instructions</button>
       <button onclick="showLeaderboard()">Leaderboard</button>
-      <button onclick="confirmEdit()">Edit Name</button>
-      <button onclick="showFeedback()">Feedback</button>     
+      
+      <button onclick="showFeedback()">Feedback</button>
+      <button id="settingsBtn" title="Settings">Settings</button>
       <button onclick="showAbout()">About</button> <!-- 👈 New button -->
       <!-- Admin Trigger Button -->
       <div id="adminDeleteContainer" style="display: none;">
-        <button onclick="showAdminDelete()">🗑️ Delete User</button>
+        <button onclick="showAdminDelete()">Admin Use</button>
       </div>
     </div>
   </div>
@@ -69,7 +70,7 @@
         <div id="controls">
           <button id="pauseBtn" onclick="togglePause()">Pause</button>
           <button id="resumeBtn" onclick="togglePause()" style="display: none;">Resume</button>
-          <button class="exitBtn" onclick="confirmExit()">Exit</button>
+          <button class="exitBtn" onclick="confirmExit()">Quit</button>
         </div>
     
         <!-- ✅ Mobile Controls -->
@@ -133,7 +134,7 @@
         ▶️ 6. Press [P] again or tap the 'Resume' button to continue.<br>
 
       </p>
-      <button onclick="closeInstructions()">Close</button>
+      <button class="exitBtn" onclick="closeInstructions()">Close</button>
     </div>
   </div>
 
@@ -155,7 +156,7 @@
       <!-- 🧑‍🤝‍🧑 List of All Players -->
       <ol id="userList" style="text-align: left; padding-left: 20px;"></ol>
 
-      <button onclick="closeAbout()">Close</button>
+      <button class="exitBtn" onclick="closeAbout()">Close</button>
     </div>
   </div>
 
@@ -196,7 +197,7 @@
       <!-- ✅ User List -->
       <ol id="userList" style="text-align: left; padding-left: 20px;"></ol>
 
-      <button onclick="closeUsers()">Close</button>
+      <button class="exitBtn" onclick="closeUsers()">Close</button>
     </div>
   </div>
 
@@ -204,7 +205,7 @@
     <div class="modal-content">
       <h2 class="About"> !! Congratulations !! </h2>
       <h2> 🏆 New highScore: <span id="newHighScoreText"></span> 🎉 </h2>
-      <button onclick="closeCongratulations()">Close</button>
+      <button class="exitBtn" onclick="closeCongratulations()">Close</button>
     </div>
   </div>
 
@@ -216,7 +217,7 @@
         🔒 We respect your privacy. <br> 💖 Join our growing family with your real name.
       </p>
       <button onclick="submitEditedUsername()">Save</button>
-      <button onclick="closeEditUsername()">Cancel</button>
+      <button class="exitBtn" onclick="closeEditUsername()">Cancel</button>
     </div>
   </div>
 
@@ -225,7 +226,7 @@
       <h2 class="About"> Leaderboard </h2>
       <h2> 🏆 Top Highscorers 🏆 </h2>
       <ul id="leaderboardList" style="list-style: none; padding: 0; text-align: center;"></ul>
-      <button onclick="closeLeaderboard()">Close</button>
+      <button class="exitBtn" onclick="closeLeaderboard()">Close</button>
     </div>
   </div>
 
@@ -248,7 +249,7 @@
       </div>
       
       <button onclick="submitFeedback()">Submit</button>
-      <button onclick="closeFeedback()">Cancel</button>
+      <button class="exitBtn" onclick="closeFeedback()">Close</button>
     </div>
   </div>
 
@@ -261,9 +262,27 @@
       <label>Serial No.:</label>
       <input type="number" id="deleteSerial" placeholder="1 for first"><br><br>
       <button onclick="deleteUserByNameSerial()">Delete</button>
-      <button onclick="closeAdminDelete()">❌ Cancel</button>
+      <button class="exitBtn" onclick="closeAdminDelete()">Cancel</button>
     </div>
   </div>
+
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <h2 class="About"> ⚙️ Settings </h2>
+      <button onclick="confirmEdit()">Edit Name</button>
+
+      <label>
+        <h2>🔊 Sound <input type="checkbox" id="soundToggle" checked /></h2>
+      </label>
+      
+      <label>
+        <h2>📳 Vibration <input type="checkbox" id="vibrationToggle" checked /></h2>
+      </label>
+      
+      <button onclick="closeSettings()">Save</button>
+    </div>
+  </div>
+
 
   <script src="script.js"></script>
 

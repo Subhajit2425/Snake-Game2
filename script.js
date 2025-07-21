@@ -102,9 +102,9 @@ const gameDiv = document.getElementById('game');
       playButtonSound();
 
       if (!isPaused) pauseGame();
-      const confirmLeave = confirm("Are You Sure You Want To Exit To The Main Menu ?");
+      const confirmLeave = confirm(" Are You Sure You Want To Quit The Game ? ");
       if (confirmLeave) {
-        showMenu();
+        endGame();
       } else {
         startCountdownThenResume(); // Optional: resume if they cancel
       }
@@ -209,7 +209,9 @@ const gameDiv = document.getElementById('game');
               score += 10;
               nTail++;
               const eatClone = eatSound.cloneNode();
-              eatClone.play();
+              if (localStorage.getItem("sound") !== "off") {
+                eatClone.play();
+              }
               vibrateMobile(100);
 
               fruit[i] = getValidPosition({x, y}, tail, fruit, obstacles, cols, rows);
@@ -226,13 +228,17 @@ const gameDiv = document.getElementById('game');
 
       if (score > highScore) {
         showCongratulations();
-        CongratulationsSound.play();
+        if (localStorage.getItem("sound") !== "off") {
+          CongratulationsSound.play();
+        }
         highScore = score;
         localStorage.setItem('snakeHighScore', highScore);
 
         saveHighScore(score); // ✅ Save to leaderboard without duplicates
       } else {
-        gameOverSound.play();
+        if (localStorage.getItem("sound") !== "off") {
+          gameOverSound.play();
+        }
       }
 
       gameDiv.classList.add("hidden");
@@ -664,6 +670,7 @@ const gameDiv = document.getElementById('game');
       const input = document.getElementById("editNameInput");
       input.value = currentName.trim();
       document.getElementById("editUsernameModal").style.display = "flex";
+      document.getElementById("settingsModal").style.display = "none";
       input.focus();
     }
     
@@ -687,8 +694,10 @@ const gameDiv = document.getElementById('game');
         // ✅ Update locally
         localStorage.setItem("playerName", newName);
         document.getElementById("editUsernameModal").style.display = "none";
-        CongratulationsSound.play();
-        alert("Your name has been updated!");
+        if (localStorage.getItem("sound") !== "off") {
+          CongratulationsSound.play();
+        }
+        alert(" Your name has been updated Successfully !! ");
 
         // ✅ Update name on screen if displayed somewhere (optional)
         const nameElement = document.getElementById("playerNameDisplay");
@@ -717,17 +726,23 @@ const gameDiv = document.getElementById('game');
 
       let count = 3;
       text.textContent = count;
-      countdownSound.play();
+      if (localStorage.getItem("sound") !== "off") {
+        countdownSound.play();
+      }
 
       const interval = setInterval(() => {
         count--;
 
         if (count > 0) {
           text.textContent = count;
-          countdownSound.play();
+          if (localStorage.getItem("sound") !== "off") {
+            countdownSound.play();
+          }
         } else if (count === 0) {
           text.textContent = "Go!";
-          goSound.play();
+          if (localStorage.getItem("sound") !== "off") {
+            goSound.play();
+          }
           vibrateMobile(300); // subtle buzz to indicate game started
 
         } else {
@@ -861,7 +876,9 @@ const gameDiv = document.getElementById('game');
 
       // Save/overwrite feedback for this userKey
       feedbackRef.set(feedbackData).then(() => {
-        CongratulationsSound.play();
+        if (localStorage.getItem("sound") !== "off") {
+          CongratulationsSound.play();
+        }
         alert("Thank You For Your Feedback! 💖");
         selectedRating = 0;
         closeFeedback();
@@ -918,7 +935,9 @@ const gameDiv = document.getElementById('game');
       if (buttonSound) {
         try {
           buttonSound.currentTime = 0;
-          buttonSound.play();
+          if (localStorage.getItem("sound") !== "off") {
+            buttonSound.play();
+          }
         } catch (e) {
           // Sound couldn't be played due to browser restrictions
         }
@@ -950,10 +969,17 @@ const gameDiv = document.getElementById('game');
     window.addEventListener("DOMContentLoaded", setupMobileControls);
 
     function vibrateMobile(pattern) {
-      if (/Mobi|Android|iPhone/i.test(navigator.userAgent) && navigator.vibrate) {
+      const vibrationSetting = localStorage.getItem("vibration");
+      
+      if (
+        vibrationSetting !== "off" &&                 // ✅ Respect the user's setting
+        /Mobi|Android|iPhone/i.test(navigator.userAgent) &&
+        navigator.vibrate
+      ) {
         navigator.vibrate(pattern);
       }
     }
+
 
     function deleteUserByNameSerial() {
       const nameToDelete = document.getElementById("deleteName").value.trim();
@@ -1002,11 +1028,52 @@ const gameDiv = document.getElementById('game');
     }
 
     function showAdminDelete() {
+      if (localStorage.getItem("sound") !== "off") {
+        buttonSound.play();
+      }
       if (confirm("⚠️ It Is Only For Admin Use. Are You Sure ?")) {
         document.getElementById('adminDeleteModal').style.display = 'flex';
       }
     }
 
     function closeAdminDelete() {
+      if (localStorage.getItem("sound") !== "off") {
+        buttonSound.play();
+      }
       document.getElementById('adminDeleteModal').style.display = 'none';
     }
+
+    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsModal = document.getElementById("settingsModal");
+    const soundToggle = document.getElementById("soundToggle");
+    const vibrationToggle = document.getElementById("vibrationToggle");
+
+    // Load saved settings from localStorage
+    window.addEventListener("load", () => {
+      const soundSetting = localStorage.getItem("sound");
+      const vibrationSetting = localStorage.getItem("vibration");
+
+      soundToggle.checked = soundSetting !== "off";       // Default ON
+      vibrationToggle.checked = vibrationSetting !== "off";
+    });
+
+    settingsBtn.addEventListener("click", () => {
+      if (localStorage.getItem("sound") !== "off") {
+        buttonSound.play();
+      }
+      settingsModal.style.display = "flex";
+    });
+
+    function closeSettings() {
+      if (localStorage.getItem("sound") !== "off") {
+        CongratulationsSound.play();
+      }
+
+      alert(" Settings has been updated Successfully !! ");
+      settingsModal.style.display = "none";
+
+      // Save settings
+      localStorage.setItem("sound", soundToggle.checked ? "on" : "off");
+      localStorage.setItem("vibration", vibrationToggle.checked ? "on" : "off");
+    }
+
