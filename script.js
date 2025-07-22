@@ -103,7 +103,7 @@ const gameDiv = document.getElementById('game');
       playButtonSound();
 
       if (!isPaused) pauseGame();
-      const confirmLeave = confirm(" Are You Sure You Want To Quit The Game ? ");
+      const confirmLeave = confirm("⚠️ Are You Sure You Want To Quit The Game ? ");
       if (confirmLeave) {
         endGame();
       } else {
@@ -524,7 +524,7 @@ const gameDiv = document.getElementById('game');
       const existingKey = localStorage.getItem("userKey");
 
       if (!name) {
-        alert("Please enter your name.");
+        alert("⚠️ Please Enter Your Name !");
         return;
       }
 
@@ -556,7 +556,7 @@ const gameDiv = document.getElementById('game');
 
       // ✅ Check for internet connection first
       if (!navigator.onLine) {
-        alert("⚠️ Internet Connection Is Slow or Unavailable.\n Please Check Your Connection And Try Again.");
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\n Please Check Your Connection And Try Again !");
         return;
       }
 
@@ -659,7 +659,7 @@ const gameDiv = document.getElementById('game');
     function confirmEdit() {
       playButtonSound();
 
-      if (confirm('Are You Sure You Want To Edit Your User Name ?')) {
+      if (confirm('⚠️ Are You Sure You Want To Edit Your User Name ?')) {
         editUsername()
       } else {
         return;
@@ -671,7 +671,7 @@ const gameDiv = document.getElementById('game');
       playButtonSound();
 
       if (!navigator.onLine) {
-        alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again.");
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again !");
         return;
       }
 
@@ -691,7 +691,7 @@ const gameDiv = document.getElementById('game');
       const key = localStorage.getItem("userKey");
 
       if (!key || !newName) {
-        alert("Invalid input or missing user ID.");
+        alert("❌ Invalid Input Or Missing User ID !");
         return;
       }
 
@@ -706,14 +706,14 @@ const gameDiv = document.getElementById('game');
         if (localStorage.getItem("sound") !== "off") {
           CongratulationsSound.play();
         }
-        alert(" Your name has been updated Successfully !! ");
+        alert("✅ Your Name Has Been Updated Successfully !");
 
         // ✅ Update name on screen if displayed somewhere (optional)
         const nameElement = document.getElementById("playerNameDisplay");
         if (nameElement) nameElement.textContent = newName;
       })
       .catch(error => {
-        alert("Update failed: " + error.message);
+        alert("❌ Update Failed: " + error.message);
       });
     }
 
@@ -793,7 +793,7 @@ const gameDiv = document.getElementById('game');
       playButtonSound();
 
       if (!navigator.onLine) {
-        alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again.");
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again !");
         return;
       }
 
@@ -864,13 +864,13 @@ const gameDiv = document.getElementById('game');
       playButtonSound();
 
       if (selectedRating === 0) {
-        alert("Please Select A Rating.");
+        alert("⚠️ Please Select A Rating !");
         return;
       }
 
       const userKey = localStorage.getItem("userKey");
       if (!userKey) {
-        alert("User Not Identified. Please Log In Again.");
+        alert("⚠️ User Not Identified. Please Log In Again !");
         return;
       }
 
@@ -882,7 +882,7 @@ const gameDiv = document.getElementById('game');
         if (localStorage.getItem("sound") !== "off") {
           CongratulationsSound.play();
         }
-        alert("Thank You For Your Feedback! 💖");
+        alert("💖 Thank You For Your Feedback !");
         closeFeedback(); // Close the modal only, don't reset rating or stars
       });
     }
@@ -893,7 +893,7 @@ const gameDiv = document.getElementById('game');
       playButtonSound();
 
       if (!navigator.onLine) {
-        alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again.");
+        alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again !");
         return;
       }
 
@@ -1017,7 +1017,7 @@ const gameDiv = document.getElementById('game');
       const serial = parseInt(document.getElementById("deleteSerial").value);
 
       if (!nameToDelete || isNaN(serial)) {
-        alert("Please enter both name and serial number.");
+        alert("⚠️ Please Enter Both Name And Serial Number ! ");
         return;
       }
 
@@ -1027,7 +1027,7 @@ const gameDiv = document.getElementById('game');
         const users = snapshot.val();
 
         if (!users) {
-          alert("No users found.");
+          alert("❌ No Users Found ! ");
           return;
         }
 
@@ -1039,12 +1039,12 @@ const gameDiv = document.getElementById('game');
               // Delete the matched user
               firebase.database().ref("users/" + userKey).remove()
                 .then(() => {
-                  alert(`✅ User "${nameToDelete}" (match #${serial}) deleted successfully.`);
+                  alert(`✅ User "${nameToDelete}" (Match #${serial}) Deleted Successfully !`);
                   closeAdminDelete();
                 })
                 .catch((error) => {
                   console.error("Delete failed:", error);
-                  alert("❌ Error deleting user.");
+                  alert("❌ Error Deleting User.");
                 });
               return;
             }
@@ -1053,7 +1053,7 @@ const gameDiv = document.getElementById('game');
 
         // If match not found
         if (matchedCount < serial) {
-          alert(`⚠️ Only ${matchedCount} "${nameToDelete}" found. Serial #${serial} doesn't exist.`);
+          alert(`⚠️ Only ${matchedCount} "${nameToDelete}" Found. Serial #${serial} Doesn't Exist.`);
         }
       });
     }
@@ -1118,7 +1118,7 @@ const gameDiv = document.getElementById('game');
         buttonSound.play();
       }
 
-      alert(" ✅ Settings has been updated Successfully !! ");
+      alert(" ✅ Settings Has Been Updated Successfully !! ");
       settingsModal.style.display = "none";
 
       // Save settings
@@ -1151,13 +1151,13 @@ const gameDiv = document.getElementById('game');
       const newHighScore = parseInt(document.getElementById("updateHighScore").value.trim());
 
       if (!name || isNaN(serial) || isNaN(newHighScore)) {
-        alert("⚠️ Please fill in all fields correctly.");
+        alert("⚠️ Please Fill In All Fields Correctly.");
         return;
       }
 
       firebase.database().ref("users").once("value", snapshot => {
         if (!snapshot.exists()) {
-          alert("❌ No users found in database.");
+          alert("❌ No Users Found In Database.");
           return;
         }
 
@@ -1171,26 +1171,26 @@ const gameDiv = document.getElementById('game');
         });
 
         if (matchingUsers.length === 0) {
-          alert(`❌ No user found with the name "${name}".`);
+          alert(`❌ No User Found With The Name "${name}".`);
           return;
         }
 
         if (serial < 1 || serial > matchingUsers.length) {
-          alert(`❌ Invalid serial number. Only ${matchingUsers.length} users found with name "${name}".`);
+          alert(`❌ Invalid Serial Number. Only ${matchingUsers.length} Users Found With Name "${name}".`);
           return;
         }
 
         const selectedUser = matchingUsers[serial - 1];
-        console.log("Updating user:", selectedUser);
+        console.log("Updating User:", selectedUser);
 
         firebase.database().ref("users/" + selectedUser.key).update({
           highScore: newHighScore
         }).then(() => {
-          alert(`✅ High score updated to ${newHighScore} for "${name}" (#${serial}).`);
+          alert(`✅ High Score Updated To ${newHighScore} For "${name}" (#${serial}).`);
           document.getElementById('adminUseModal').style.display = 'none';
           document.getElementById('adminUpdateContainer').style.display = 'none';
         }).catch(error => {
-          alert("❌ Error updating high score: " + error.message);
+          alert("❌ Error Updating High Score: " + error.message);
         });
       });
     });
