@@ -10,7 +10,7 @@ const gameDiv = document.getElementById('game');
     let cols = Math.floor(canvas.width / tileSize);
     let rows = Math.floor(canvas.height / tileSize);
 
-    let isCountingDown = false;
+    window.isCountingDown = false;
     let x, y, dx, dy, score, nTail, tail, fruit, fruitNo = 5, obstacles, gameOver = false, dir = 'UP', gameNo = 0, isPaused = false;
     let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false, obstacleCount = 20;
     let directionLocked = false;
@@ -99,6 +99,7 @@ const gameDiv = document.getElementById('game');
     }
 
     function confirmExit() {
+      if (window.isCountingDown) return;
       playButtonSound();
 
       if (!isPaused) pauseGame();
@@ -315,6 +316,14 @@ const gameDiv = document.getElementById('game');
     }
 
 
+    function newGame() {
+      playButtonSound();
+
+      document.getElementById("menu").style.display = "flex";
+      document.getElementById("gameOver").classList.add("hidden");
+
+      document.getElementById("difficultyModal").style.display = "flex";
+    }
 
     function showInstruction() {
       playButtonSound();
@@ -632,8 +641,8 @@ const gameDiv = document.getElementById('game');
 
 
     function togglePause() {
+      if (!gameRunning || window.isCountingDown) return;
       playButtonSound();
-      if (!gameRunning) return;
 
       if (isPaused) {
         // 👉 Resume with countdown
@@ -715,10 +724,14 @@ const gameDiv = document.getElementById('game');
     }
 
     function startCountdownThenResume() {
-      draw();
+      document.getElementById("pauseBtn").style.display = "inline-block";
+      document.getElementById("resumeBtn").style.display = "none";
 
+      // ✅ Prevent multiple countdowns
       if (window.isCountingDown) return;
-      window.isCountingDown = true;
+      window.isCountingDown = true; // 🔒 disable pause/exit buttons
+
+      draw();
 
       const overlay = document.getElementById("countdownOverlay");
       const text = document.getElementById("countdownText");
@@ -726,6 +739,7 @@ const gameDiv = document.getElementById('game');
 
       let count = 3;
       text.textContent = count;
+
       if (localStorage.getItem("sound") !== "off") {
         countdownSound.play();
       }
@@ -744,28 +758,22 @@ const gameDiv = document.getElementById('game');
             goSound.play();
           }
           vibrateMobile(300); // subtle buzz to indicate game started
-
         } else {
           clearInterval(interval);
           overlay.style.display = "none";
-          text.textContent = ""; // Optional reset
+          text.textContent = "";
 
-          // ✅ Fix: Clear any previous game interval before starting new one
-          clearInterval(gameInterval); 
-
-          // ✅ Start the game loop fresh
-          gameInterval = setInterval(gameLoop, speed);
+          clearInterval(gameInterval); // Stop any old loop
+          gameInterval = setInterval(gameLoop, speed); // Start fresh
 
           isPaused = false;
           gameRunning = true;
 
-          document.getElementById("pauseBtn").style.display = "inline-block";
-          document.getElementById("resumeBtn").style.display = "none";
-
-          window.isCountingDown = false;
+          window.isCountingDown = false; // ✅ allow pause/exit again
         }
       }, 1000);
     }
+
 
     function saveHighScore(score) {
       const name = localStorage.getItem("playerName");
@@ -866,22 +874,16 @@ const gameDiv = document.getElementById('game');
         return;
       }
 
-      const feedbackRef = firebase.database().ref("feedbacks/" + userKey);
+      // Reference to feedback under user
+      const feedbackRef = firebase.database().ref("users/" + userKey + "/feedback");
 
-      const feedbackData = {
-        rating: selectedRating,
-        timestamp: Date.now()
-      };
-
-      // Save/overwrite feedback for this userKey
-      feedbackRef.set(feedbackData).then(() => {
+      // Just save the rating
+      feedbackRef.set(selectedRating).then(() => {
         if (localStorage.getItem("sound") !== "off") {
           CongratulationsSound.play();
         }
         alert("Thank You For Your Feedback! 💖");
-        selectedRating = 0;
-        closeFeedback();
-        document.querySelectorAll(".star").forEach(s => s.classList.remove("selected"));
+        closeFeedback(); // Close the modal only, don't reset rating or stars
       });
     }
 
@@ -890,15 +892,38 @@ const gameDiv = document.getElementById('game');
     function showFeedback() {
       playButtonSound();
 
-      // ✅ Check for internet connection first
       if (!navigator.onLine) {
         alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again.");
         return;
       }
 
-      loadAverageRating(); // ✅ Load and show average stars
-      document.getElementById("feedbackModal").style.display = "flex"; // ✅ Show modal
+      loadAverageRating();
+
+      document.getElementById("feedbackModal").style.display = "flex";
+
+      const userKey = localStorage.getItem("userKey");
+      if (!userKey) return;
+
+      // ✅ Fetch previously stored feedback
+      const ref = firebase.database().ref("users/" + userKey + "/feedback");
+      ref.once("value", snapshot => {
+        const feedback = snapshot.val();
+        if (feedback !== null && feedback >= 1 && feedback <= 5) {
+          selectedRating = feedback;
+
+          // Highlight stars
+          const stars = document.querySelectorAll(".star");
+          stars.forEach((s, i) => {
+            if (i < feedback) {
+              s.classList.add("selected");
+            } else {
+              s.classList.remove("selected");
+            }
+          });
+        }
+      });
     }
+
 
 
     function closeFeedback() {
@@ -909,7 +934,7 @@ const gameDiv = document.getElementById('game');
 
     function loadAverageRating() {
       const avgEl = document.getElementById("avgRatingValue");
-      const ref = firebase.database().ref("feedbacks");
+      const ref = firebase.database().ref("users");
 
       ref.once("value", snapshot => {
         const data = snapshot.val();
@@ -918,16 +943,23 @@ const gameDiv = document.getElementById('game');
           return;
         }
 
-        const ratings = Object.values(data).map(f => f.rating);
-        const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+        // Extract feedback values
+        const ratings = Object.values(data)
+          .filter(user => user.feedback !== undefined)
+          .map(user => user.feedback);
 
-        // Format to 1 decimal
+        if (ratings.length === 0) {
+          avgEl.textContent = "No ratings yet.";
+          return;
+        }
+
+        const average = ratings.reduce((a, b) => a + b, 0) / ratings.length;
         const formatted = average.toFixed(1);
-        
-        // Show stars with number
+
         avgEl.innerHTML = `⭐ ${formatted} (${ratings.length} votes)`;
       });
     }
+
 
     function playButtonSound() {      
       buttonSound.volume = 0.5;
@@ -1083,10 +1115,10 @@ const gameDiv = document.getElementById('game');
 
     function closeSettings() {
       if (localStorage.getItem("sound") !== "off") {
-        CongratulationsSound.play();
+        buttonSound.play();
       }
 
-      alert(" Settings has been updated Successfully !! ");
+      alert(" ✅ Settings has been updated Successfully !! ");
       settingsModal.style.display = "none";
 
       // Save settings

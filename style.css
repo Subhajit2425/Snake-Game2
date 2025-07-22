@@ -181,6 +181,13 @@ html, body {
       border: 2px solid #8562b3;
     }
 
+    .buttons {
+      display: flex;
+      justify-content: center; /* or space-between / flex-end / flex-start as needed */
+      gap: 20px; /* spacing between buttons */
+      margin-top: 20px;
+    }
+
     @keyframes pulseText {
       0% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.8; transform: scale(1.05); }
@@ -386,4 +393,18 @@ html, body {
 
     #adminDeleteContainer {
       display: none;
+    }
+
+    .setting-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0;
+      font-size: 0.8rem;
+    }
+
+    .setting-option label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }

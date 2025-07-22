@@ -95,7 +95,7 @@
     <h2 id="gameOverText"></h2>
     <div class="overButtons">
       <button onclick="startGame()">Restart</button>
-      <button onclick="showMenu()">Cancel</button>
+      <button onclick="newGame()">New Game</button>
       <button class="exitBtn" onclick="showMenu()">Exit</button>
     </div>
   </div>
@@ -248,28 +248,35 @@
         <span class="star" data-value="5">★</span>
       </div>
       
-      <button onclick="submitFeedback()">Submit</button>
-      <button class="exitBtn" onclick="closeFeedback()">Close</button>
+      <div class="buttons">
+        <button class="exitBtn" onclick="closeFeedback()">Close</button>
+        <button onclick="submitFeedback()">Submit</button>
+      </div>
     </div>
   </div>
 
 
   <div id="settingsModal" class="modal">
-    <div class="modal-content">
-      <h2 class="About"> ⚙️ Settings </h2>
-      <button onclick="confirmEdit()">Edit Name</button>
+  <div class="modal-content">
+    <h2 class="About">⚙️ Settings</h2>
 
-      <label>
-        <h2>🔊 Sound <input type="checkbox" id="soundToggle" checked /></h2>
-      </label>
-      
-      <label>
-        <h2>📳 Vibration <input type="checkbox" id="vibrationToggle" checked /></h2>
-      </label>
-      
+    <div class="setting-option">
+      <label for="soundToggle"><h2>🔊 Sound </h2></label>
+      <input type="checkbox" id="soundToggle" checked />
+    </div>
+
+    <div class="setting-option">
+      <label for="vibrationToggle"><h2>📳 Vibration </h2></label>
+      <input type="checkbox" id="vibrationToggle" checked />
+    </div>
+
+    <div class="buttons">
+      <button onclick="confirmEdit()">Edit Name</button>
       <button onclick="closeSettings()">Save</button>
     </div>
   </div>
+</div>
+
 
 
   <!-- Admin Delete Modal -->
