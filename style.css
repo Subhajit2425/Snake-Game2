@@ -136,7 +136,7 @@ html, body {
     #SnakeM, #OverHeader, .About {
       font-size: 1.5rem;
       letter-spacing: 2px;
-      background: linear-gradient(90deg, #00ffea, #5b42f3, #ff3c83);
+      background: linear-gradient(135deg, #00ffea, #4a2eff, #962fbf, #ff3c83);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -161,7 +161,7 @@ html, body {
       font-size: 1rem;
       padding: 10px 25px;
       background: linear-gradient(135deg, #1f1f1f, #333);
-      color: #fff;
+      color: #ffffff;
       border: 2px solid #8562b3;
       cursor: pointer;
       border-radius: 30px;
@@ -170,15 +170,19 @@ html, body {
     }
 
     button:hover {
-      background: linear-gradient(135deg, rgb(172, 15, 91), #4516b4);
+      background: linear-gradient(135deg, #00ffea, #4a2eff, #962fbf, #ff3c83);
       transform: scale(1.05);
       border-color: rgb(0, 240, 240);
       box-shadow: 0 0 10px #9f79ff;
     }
 
     .exitBtn {
-      background: linear-gradient(135deg, #C42B1C, #5a0e09);
+      background: linear-gradient(135deg, #cd1100, #c00d00);
       border: 2px solid #8562b3;
+    }
+
+    .exitBtn:hover {
+      background: linear-gradient(135deg, #9a0d00, #740800);
     }
 
     .buttons {

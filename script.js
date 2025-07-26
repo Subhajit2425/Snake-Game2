@@ -317,10 +317,6 @@ const gameDiv = document.getElementById('game');
 
     function newGame() {
       playButtonSound();
-
-      document.getElementById("menu").style.display = "flex";
-      document.getElementById("gameOver").classList.add("hidden");
-
       document.getElementById("difficultyModal").style.display = "flex";
     }
 
