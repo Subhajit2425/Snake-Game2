@@ -33,22 +33,25 @@
   <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
 </head>
 
 <body>
 
   <!-- ✅ Main Menu -->
   <div id="menu" class="overlay">
-    <div style="height: 10vh;"></div>
+    <div style="height: 10vh; display: flex; align-items: center; justify-content: flex-start; padding-left: 10px;">
+      <button id="profile-btn" onclick="showProfile()"><i class="ri-user-fill" style="color: #ffffff;"></i></button>
+      <button id="settings-btn" title="Settings">⚙️</button>
+    </div>
+
     <h1 id="SnakeM">SNAKE 2.0</h1>
     <div class="menuButtons">
       <button onclick="selectDifficulty()">Start Game</button>
       <button onclick="showUsers()">Community</button>
       <button onclick="showInstruction()">Instructions</button>
       <button onclick="showLeaderboard()">Leaderboard</button>
-      
       <button onclick="showFeedback()">Feedback</button>
-      <button id="settingsBtn" title="Settings">Settings</button>
       <button onclick="showAbout()">About</button> <!-- 👈 New button -->
       <!-- Admin Trigger Button -->
       <div id="adminDeleteContainer" style="display: none;">
@@ -214,8 +217,11 @@
       <p style="font-size: 0.75rem; color: #ccc; margin-top: 10px;">
         🔒 We respect your privacy. <br> 💖 Join our growing family with your real name.
       </p>
-      <button onclick="submitEditedUsername()">Save</button>
-      <button class="exitBtn" onclick="closeEditUsername()">Cancel</button>
+
+      <div class="buttons">
+        <button class="exitBtn" onclick="closeEditUsername()">Cancel</button>
+        <button onclick="submitEditedUsername()">Save</button>
+      </div>
     </div>
   </div>
 
@@ -255,26 +261,39 @@
 
 
   <div id="settingsModal" class="modal">
-  <div class="modal-content">
-    <h2 class="About">⚙️ Settings</h2>
+    <div class="modal-content">
+      <h2 class="About">⚙️ Settings</h2>
 
-    <div class="setting-option">
-      <label for="soundToggle"><h2>🔊 Sound </h2></label>
-      <input type="checkbox" id="soundToggle" checked />
-    </div>
+      <div class="setting-option">
+        <label for="soundToggle"><h2>🔊 Sound </h2></label>
+        <input type="checkbox" id="soundToggle" checked />
+      </div>
 
-    <div class="setting-option">
-      <label for="vibrationToggle"><h2>📳 Vibration </h2></label>
-      <input type="checkbox" id="vibrationToggle" checked />
-    </div>
+      <div class="setting-option">
+        <label for="vibrationToggle"><h2>📳 Vibration </h2></label>
+        <input type="checkbox" id="vibrationToggle" checked />
+      </div>
 
-    <div class="buttons">
-      <button onclick="confirmEdit()">Edit Name</button>
-      <button onclick="closeSettings()">Save</button>
+      <div class="buttons">
+        <button onclick="closeSettings()">Save</button>
+      </div>
     </div>
   </div>
-</div>
 
+  <!-- ✅ Profile Modal -->
+  <div id="profileModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2 class="About"> 👤 Profile </h2>
+        <h2><strong>Name:</strong> <span id="profile-name"></span></h2>
+        <h2><strong>High Score:</strong> <span id="profile-highscore"></span></h2>
+        <h2><strong>Matches Played:</strong> <span id="profile-matches"></span></h2>
+
+        <div class="buttons">
+          <button onclick="confirmEdit()">Edit Name</button>
+          <button class="exitBtn" onclick="closeProfile()">Close</button>
+        </div>
+    </div>
+  </div>
 
 
   <!-- Admin Delete Modal -->

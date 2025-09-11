@@ -10,8 +10,13 @@ const gameDiv = document.getElementById('game');
     let cols = Math.floor(canvas.width / tileSize);
     let rows = Math.floor(canvas.height / tileSize);
 
+    const userKey = localStorage.getItem("userKey");
+    let playerName = localStorage.getItem("playerName");
+    let gameNo = localStorage.getItem("gameNum");
+    
+
     window.isCountingDown = false;
-    let x, y, dx, dy, score, nTail, tail, fruit, fruitNo = 5, obstacles, gameOver = false, dir = 'UP', gameNo = 0, isPaused = false;
+    let x, y, dx, dy, score, nTail, tail, fruit, fruitNo = 5, obstacles, gameOver = false, dir = 'UP', isPaused = false;
     let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false, obstacleCount = 20;
     let directionLocked = false;
 
@@ -23,6 +28,22 @@ const gameDiv = document.getElementById('game');
     const countdownSound = document.getElementById('countdownSound');
     const goSound = document.getElementById('goSound');
     const buttonSound = document.getElementById("buttonSound");
+
+
+    // ✅ Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD35N3rYOmW9gHjDJUQIBqatz-z4TgB4zg",
+      authDomain: "snake-game-users-4b938.firebaseapp.com",
+      databaseURL: "https://snake-game-users-4b938-default-rtdb.firebaseio.com",
+      projectId: "snake-game-users-4b938",
+      storageBucket: "snake-game-users-4b938.firebasestorage.app",
+      messagingSenderId: "907563248454",
+      appId: "1:907563248454:web:33340124d52b12e51e9347"
+    };
+
+    // ✅ Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
 
     function isOccupied(x, y, snakeHead, tail, fruits,  obstacles) {
@@ -244,6 +265,21 @@ const gameDiv = document.getElementById('game');
       gameDiv.classList.add("hidden");
       document.getElementById("gameOver").classList.remove("hidden");
       document.getElementById("gameOverText").textContent = `Score: ${score}\nHigh Score: ${highScore}`;
+
+
+      const gameNumRef = firebase.database().ref("users/" + userKey + "/gameNum");
+
+      gameNumRef.transaction(current => {
+        return (current || 0) + 1;
+      }, (error, committed, snapshot) => {
+        if (committed) {
+          gameNo = snapshot.val();  // new value
+          localStorage.setItem("gameNum", gameNo);  // ✅ save updated value
+          console.log("✅ gameNum updated & saved to localStorage:", gameNo);
+        } else if (error) {
+          console.error("Transaction failed:", error);
+        }
+      });
     }
 
 
@@ -254,7 +290,6 @@ const gameDiv = document.getElementById('game');
 
     function startGame() {
       initGame();
-      gameNo++;
       isPaused = true;          // ✅ Set paused to true initially
       gameRunning = true;
 
@@ -350,6 +385,21 @@ const gameDiv = document.getElementById('game');
     function closeCongratulations() {
       playButtonSound();
       document.getElementById("CongratulationsModal").style.display = "none";
+    }
+
+    function showProfile() {
+      playButtonSound();
+
+      document.getElementById("profile-name").textContent = playerName;
+      document.getElementById("profile-highscore").textContent = highScore;
+      document.getElementById("profile-matches").textContent = gameNo;
+
+      document.getElementById("profileModal").style.display = "flex";
+    }
+
+    function closeProfile() {
+      playButtonSound();
+      document.getElementById("profileModal").style.display = "none";
     }
 
 
@@ -452,9 +502,6 @@ const gameDiv = document.getElementById('game');
     window.addEventListener("load", () => {
       loadHighScore()
 
-      const userKey = localStorage.getItem("userKey");
-      const playerName = localStorage.getItem("playerName");
-
       const loading = document.getElementById("loadingOverlay");
       const login = document.getElementById("loginModal");
       const menu = document.getElementById("menu");
@@ -526,7 +573,7 @@ const gameDiv = document.getElementById('game');
       if (existingKey) {
         localStorage.setItem("playerName", name);
         document.getElementById("loginModal").style.display = "none";
-        document.getElementById("menu").style.display = "flex";
+        
         return;
       }
 
@@ -602,21 +649,6 @@ const gameDiv = document.getElementById('game');
     }
 
 
-    // ✅ Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyD35N3rYOmW9gHjDJUQIBqatz-z4TgB4zg",
-      authDomain: "snake-game-users-4b938.firebaseapp.com",
-      databaseURL: "https://snake-game-users-4b938-default-rtdb.firebaseio.com",
-      projectId: "snake-game-users-4b938",
-      storageBucket: "snake-game-users-4b938.firebasestorage.app",
-      messagingSenderId: "907563248454",
-      appId: "1:907563248454:web:33340124d52b12e51e9347"
-    };
-
-    // ✅ Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
     // ✅ Recover missing userKey for old users
     window.addEventListener("load", () => {
       const currentName = localStorage.getItem("playerName");
@@ -664,6 +696,8 @@ const gameDiv = document.getElementById('game');
     function editUsername() {
       playButtonSound();
 
+      document.getElementById("profileModal").style.display = "none";
+
       if (!navigator.onLine) {
         alert("⚠️ Internet Connection Is Slow or Unavailable.\nPlease Check Your Connection And Try Again !");
         return;
@@ -697,6 +731,9 @@ const gameDiv = document.getElementById('game');
         // ✅ Update locally
         localStorage.setItem("playerName", newName);
         document.getElementById("editUsernameModal").style.display = "none";
+        playerName = localStorage.getItem("playerName");
+        document.getElementById("profile-name").textContent = playerName;
+        document.getElementById("profileModal").style.display = "flex";
         if (localStorage.getItem("sound") !== "off") {
           CongratulationsSound.play();
         }
@@ -715,6 +752,7 @@ const gameDiv = document.getElementById('game');
     function closeEditUsername() {
       playButtonSound();
       document.getElementById("editUsernameModal").style.display = "none";
+      document.getElementById("profileModal").style.display = "flex";
     }
 
     function startCountdownThenResume() {
@@ -1085,7 +1123,7 @@ const gameDiv = document.getElementById('game');
       document.getElementById('adminUseModal').style.display = 'flex';
     }
 
-    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsBtn = document.getElementById("settings-btn");
     const settingsModal = document.getElementById("settingsModal");
     const soundToggle = document.getElementById("soundToggle");
     const vibrationToggle = document.getElementById("vibrationToggle");
@@ -1111,7 +1149,6 @@ const gameDiv = document.getElementById('game');
         buttonSound.play();
       }
 
-      alert(" ✅ Settings Has Been Updated Successfully !! ");
       settingsModal.style.display = "none";
 
       // Save settings

@@ -8,7 +8,7 @@ html, body {
     }
 
     body {
-      background-color: black;
+      background-color: rgb(0, 0, 0);
       color: white;
       font-family: monospace;
       white-space: pre;
@@ -412,3 +412,30 @@ html, body {
       align-items: center;
       gap: 8px;
     }
+
+    #profile-btn {
+      position: absolute;   /* ignores parent flex alignment */
+      top: 10px;
+      left: 10px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      z-index: 2000; /* makes sure it’s always on top */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #settings-btn {
+      position: fixed;    /* stays at top-right even when scrolling */
+      top: 10px;          /* distance from the top */
+      right: 10px;        /* distance from the right */
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      z-index: 2000;      /* makes sure it stays above other elements */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
