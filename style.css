@@ -176,6 +176,11 @@ html, body {
       box-shadow: 0 0 10px #9f79ff;
     }
 
+    #profile-btn, #settings-btn {
+      border: none;
+      font-size: larger;
+    }
+
     .exitBtn {
       background: linear-gradient(135deg, #cd1100, #c00d00);
       border: 2px solid #8562b3;
@@ -420,7 +425,6 @@ html, body {
       width: 40px;
       height: 40px;
       cursor: pointer;
-      z-index: 2000; /* makes sure it’s always on top */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -433,7 +437,6 @@ html, body {
       width: 40px;
       height: 40px;
       cursor: pointer;
-      z-index: 2000;      /* makes sure it stays above other elements */
       display: flex;
       align-items: center;
       justify-content: center;

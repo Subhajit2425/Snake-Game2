@@ -13,6 +13,8 @@ const gameDiv = document.getElementById('game');
     const userKey = localStorage.getItem("userKey");
     let playerName = localStorage.getItem("playerName");
     let gameNo = localStorage.getItem("gameNum");
+    let averageScore = localStorage.getItem("averageScore");
+    let totalScore = localStorage.getItem("totalScore");
     
 
     window.isCountingDown = false;
@@ -280,6 +282,28 @@ const gameDiv = document.getElementById('game');
           console.error("Transaction failed:", error);
         }
       });
+
+
+      const totalScoreRef = firebase.database().ref("users/" + userKey + "/totalScore");
+
+      totalScoreRef.transaction(current => {
+        return (current || 0) + score;
+      }, (error, committed, snapshot) => {
+        if (committed) {
+          totalScore = snapshot.val();  // new value
+          localStorage.setItem("totalScore", totalScore);  // ✅ save updated value
+          console.log("✅ gameNum updated & saved to localStorage:", totalScore);
+        } else if (error) {
+          console.error("Transaction failed:", error);
+        }
+      });
+
+
+      averageScore = Math.round((totalScore / gameNo) * 100) / 100;
+      firebase.database().ref("users/" + userKey).update({
+        avScore: averageScore
+      });
+      localStorage.setItem("averageScore", averageScore);  // ✅ save updated value
     }
 
 
@@ -393,6 +417,8 @@ const gameDiv = document.getElementById('game');
       document.getElementById("profile-name").textContent = playerName;
       document.getElementById("profile-highscore").textContent = highScore;
       document.getElementById("profile-matches").textContent = gameNo;
+      document.getElementById("profile-totalScore").textContent = totalScore;
+      document.getElementById("profile-avScore").textContent = averageScore;
 
       document.getElementById("profileModal").style.display = "flex";
     }
