@@ -179,6 +179,7 @@ html, body {
     #profile-btn, #settings-btn {
       border: none;
       font-size: larger;
+      background: transparent;
     }
 
     .exitBtn {

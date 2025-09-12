@@ -270,40 +270,39 @@ const gameDiv = document.getElementById('game');
 
 
       const gameNumRef = firebase.database().ref("users/" + userKey + "/gameNum");
+      const totalScoreRef = firebase.database().ref("users/" + userKey + "/totalScore");
 
+      // 1. Update game number
       gameNumRef.transaction(current => {
         return (current || 0) + 1;
       }, (error, committed, snapshot) => {
         if (committed) {
-          gameNo = snapshot.val();  // new value
-          localStorage.setItem("gameNum", gameNo);  // ✅ save updated value
-          console.log("✅ gameNum updated & saved to localStorage:", gameNo);
-        } else if (error) {
-          console.error("Transaction failed:", error);
+          gameNo = snapshot.val();
+          localStorage.setItem("gameNum", gameNo);
+          console.log("✅ gameNum updated:", gameNo);
+
+          // 2. Update total score only after gameNo updated
+          totalScoreRef.transaction(current => {
+            return (current || 0) + score;
+          }, (error, committed, snapshot) => {
+            if (committed) {
+              totalScore = snapshot.val();
+              localStorage.setItem("totalScore", totalScore);
+              console.log("✅ totalScore updated:", totalScore);
+
+              // 3. Now calculate average (safe, because both values are fresh)
+              averageScore = Math.round((totalScore / gameNo) * 100) / 100;
+
+              firebase.database().ref("users/" + userKey).update({
+                avScore: averageScore
+              });
+
+              localStorage.setItem("averageScore", averageScore);
+              console.log("✅ averageScore updated:", averageScore);
+            }
+          });
         }
       });
-
-
-      const totalScoreRef = firebase.database().ref("users/" + userKey + "/totalScore");
-
-      totalScoreRef.transaction(current => {
-        return (current || 0) + score;
-      }, (error, committed, snapshot) => {
-        if (committed) {
-          totalScore = snapshot.val();  // new value
-          localStorage.setItem("totalScore", totalScore);  // ✅ save updated value
-          console.log("✅ gameNum updated & saved to localStorage:", totalScore);
-        } else if (error) {
-          console.error("Transaction failed:", error);
-        }
-      });
-
-
-      averageScore = Math.round((totalScore / gameNo) * 100) / 100;
-      firebase.database().ref("users/" + userKey).update({
-        avScore: averageScore
-      });
-      localStorage.setItem("averageScore", averageScore);  // ✅ save updated value
     }
 
 
