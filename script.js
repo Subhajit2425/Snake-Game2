@@ -468,6 +468,60 @@ const gameDiv = document.getElementById('game');
       else if (key === "KeyQ" && gameOver) showMenu();
     });
 
+    // 📱 Swipe controls
+    let startX, startY, startTime;
+    let swipeHandled = false;
+
+    document.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      startTime = e.timeStamp;
+      swipeHandled = false;
+    });
+
+    document.addEventListener("touchmove", e => {
+      if (swipeHandled) return;
+
+      let currentX = e.touches[0].clientX;
+      let currentY = e.touches[0].clientY;
+
+      let dx = currentX - startX;
+      let dy = currentY - startY;
+
+      let absDx = Math.abs(dx);
+      let absDy = Math.abs(dy);
+
+      let elapsed = e.timeStamp - startTime;
+      let minSwipeDist = elapsed < 150 ? 15 : 30;
+
+      let newDir = null;
+
+      if (absDx > absDy && absDx > minSwipeDist) {
+        newDir = dx > 0 ? "RIGHT" : "LEFT";
+      } else if (absDy > minSwipeDist) {
+        newDir = dy > 0 ? "DOWN" : "UP";
+      }
+
+      if (newDir) {
+        // ✅ Instantly apply if valid turn
+        if (
+          (newDir === 'UP' && dir !== 'DOWN') ||
+          (newDir === 'DOWN' && dir !== 'UP') ||
+          (newDir === 'LEFT' && dir !== 'RIGHT') ||
+          (newDir === 'RIGHT' && dir !== 'LEFT')
+        ) {
+          dir = newDir;  
+          directionLocked = true; // still prevents mid-frame spam
+        }
+        swipeHandled = true;
+      }
+    });
+
+    document.addEventListener("touchend", () => {
+      swipeHandled = false;
+    });
+    
+
 
     function resizeGame() {
       const wrapper = document.getElementById('gameWrapper');
@@ -517,7 +571,7 @@ const gameDiv = document.getElementById('game');
     window.addEventListener('DOMContentLoaded', () => {
       const mobileControls = document.getElementById('mobileControls');
       if (isMobileDevice()) {
-        mobileControls.style.display = 'flex';
+        mobileControls.style.display = 'none';
       } else {
         mobileControls.style.display = 'none';
       }
