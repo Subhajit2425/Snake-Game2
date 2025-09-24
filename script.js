@@ -10,7 +10,7 @@ const gameDiv = document.getElementById('game');
     let cols = Math.floor(canvas.width / tileSize);
     let rows = Math.floor(canvas.height / tileSize);
 
-    const userKey = localStorage.getItem("userKey");
+    let userKey = localStorage.getItem("userKey");
     let playerName = localStorage.getItem("playerName");
     let gameNo = localStorage.getItem("gameNum");
     let averageScore = localStorage.getItem("averageScore");
@@ -712,7 +712,15 @@ const gameDiv = document.getElementById('game');
 
       // ✅ Save key and name locally
       localStorage.setItem("userKey", newRef.key);
+      userKey = newRef.key;
       localStorage.setItem("playerName", name);
+      playerName = name;
+      localStorage.setItem("gameNum", 0);
+      gameNo = 0;
+      localStorage.setItem("averageScore", 0);
+      averageScore = 0;
+      localStorage.setItem("totalScore", 0);
+      totalScore = 0;
 
       document.getElementById("loginModal").style.display = "none";
       document.getElementById("menu").style.display = "flex";
@@ -733,7 +741,6 @@ const gameDiv = document.getElementById('game');
       list.innerHTML = "";
       serialInfo.innerHTML = "";
 
-      const currentUser = localStorage.getItem("playerName");
 
       firebase.database().ref('users').once('value', (snapshot) => {
         const users = [];
@@ -753,7 +760,7 @@ const gameDiv = document.getElementById('game');
           name.textContent = user;
           name.classList.add("community-name");
 
-          if (user === currentUser) {
+          if (user === playerName) {
             name.style.color = "red";
             name.style.fontWeight = "bold";
             serialInfo.innerHTML = `👤 <strong>${index + 1}. ${user} (You) ❤️ </strong>`;
@@ -777,13 +784,10 @@ const gameDiv = document.getElementById('game');
 
 
     // ✅ Recover missing userKey for old users
-    window.addEventListener("load", () => {
-      const currentName = localStorage.getItem("playerName");
-      const storedKey = localStorage.getItem("userKey");
-
-      if (currentName && !storedKey) {
+    window.addEventListener("load", () => {     
+      if (playerName && !userKey) {
         // Try to find the matching Firebase entry
-        firebase.database().ref("users").orderByChild("name").equalTo(currentName).once("value", snapshot => {
+        firebase.database().ref("users").orderByChild("name").equalTo(playerName).once("value", snapshot => {
           snapshot.forEach(child => {
             // Save the matched key
             localStorage.setItem("userKey", child.key);
@@ -830,9 +834,8 @@ const gameDiv = document.getElementById('game');
         return;
       }
 
-      const currentName = localStorage.getItem("playerName") || '';
       const input = document.getElementById("editNameInput");
-      input.value = currentName.trim();
+      input.value = playerName.trim();
       document.getElementById("editUsernameModal").style.display = "flex";
       document.getElementById("settingsModal").style.display = "none";
       input.focus();
@@ -843,15 +846,14 @@ const gameDiv = document.getElementById('game');
       playButtonSound();
 
       const newName = document.getElementById("editNameInput").value.trim(); // ✅ fixed ID
-      const key = localStorage.getItem("userKey");
 
-      if (!key || !newName) {
+      if (!userKey || !newName) {
         alert("❌ Invalid Input Or Missing User ID !");
         return;
       }
 
       // ✅ Update in Firebase
-      firebase.database().ref(`users/${key}`).update({
+      firebase.database().ref(`users/${userKey}`).update({
         name: newName
       })
       .then(() => {
@@ -935,13 +937,10 @@ const gameDiv = document.getElementById('game');
 
 
     function saveHighScore(score) {
-      const name = localStorage.getItem("playerName");
-      const key = localStorage.getItem("userKey");
-
-      if (!key || !name) return;
+      if (!userKey || !playerName) return;
 
       // Save or update high score for the unique user
-      firebase.database().ref("users/" + key).update({
+      firebase.database().ref("users/" + userKey).update({
         highScore: score
       });
     }
@@ -1026,7 +1025,6 @@ const gameDiv = document.getElementById('game');
         return;
       }
 
-      const userKey = localStorage.getItem("userKey");
       if (!userKey) {
         alert("⚠️ User Not Identified. Please Log In Again !");
         return;
@@ -1059,7 +1057,7 @@ const gameDiv = document.getElementById('game');
 
       document.getElementById("feedbackModal").style.display = "flex";
 
-      const userKey = localStorage.getItem("userKey");
+
       if (!userKey) return;
 
       // ✅ Fetch previously stored feedback
@@ -1355,14 +1353,10 @@ const gameDiv = document.getElementById('game');
     });
 
     function loadHighScore() {
-      const key = localStorage.getItem("userKey");
-      if (!key) return;
+      if (!userKey) return;
 
-      firebase.database().ref("users/" + key).once("value").then(snapshot => {
+      firebase.database().ref("users/" + userKey).once("value").then(snapshot => {
         const data = snapshot.val();
         highScore = parseInt(data?.highScore) || 0;
-
-        // Update UI if needed
-        document.getElementById("highScoreDisplay").textContent = highScore;
       });
     }
