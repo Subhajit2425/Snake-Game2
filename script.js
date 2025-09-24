@@ -148,8 +148,9 @@ const gameDiv = document.getElementById('game');
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      drawCheckerboardBackground(); // 👈 Add this line first
+      drawCheckerboardBackground(); // 👈 background
 
+      // 📝 Scoreboard
       ctx.save();
       ctx.font = "20px monospace";
       ctx.fillStyle = "white";
@@ -159,36 +160,53 @@ const gameDiv = document.getElementById('game');
       ctx.textAlign = "right";
       ctx.fillText(`High Score: ${highScore}`, canvas.width - 10, 20);
       ctx.textAlign = "left"; // reset alignment
-      ctx.restore(); // Restores all previous canvas state
+      ctx.restore();
 
-
-      // 🐍 Head of the snake
-      ctx.font = `${tileSize * 1.1}px Arial`;  // instead of tileSize + 2
+      // 🐍 Snake head
+      ctx.save();
+      ctx.font = `${tileSize * 1.1}px Arial`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("🟢", x * tileSize + tileSize / 2, y * tileSize + tileSize / 2);
+      ctx.restore();
 
-
-      // 🟩 Tail of the snake
+      // 🐍 Snake tail
+      ctx.save();
+      ctx.font = `${tileSize * 1.1}px Arial`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
       for (let i = 0; i < tail.length; i++) {
         ctx.fillText("🟢", tail[i].x * tileSize + tileSize / 2, tail[i].y * tileSize + tileSize / 2);
       }
+      ctx.restore();
 
-
-      ctx.font = `${tileSize + 1}px Arial`; // Adjust font size as needed
+      // 🍎 Fruits with steady glow
+      ctx.font = `${tileSize + 1}px Arial`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
       fruit.forEach(f => {
+        ctx.save();
+
+        // 🎇 Glow effect
+        ctx.shadowColor = "yellow";
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
         ctx.fillText("🍎", f.x * tileSize + tileSize / 2, f.y * tileSize + tileSize / 2);
+
+        ctx.restore();
       });
 
-
+      // ⬛ Obstacles
       ctx.fillStyle = "gray";
       obstacles.forEach(o => {
         ctx.fillRect(o.x * tileSize, o.y * tileSize, tileSize, tileSize);
       });
     }
+
+
 
     function update() {
         if (gameOver || isPaused) return;
